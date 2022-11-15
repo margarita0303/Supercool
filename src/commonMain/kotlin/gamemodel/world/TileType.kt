@@ -1,6 +1,6 @@
 package game.world
 
-import com.soywiz.korge.view.SpriteAnimation
+import com.soywiz.korge.view.*
 
 enum class TileType(val blocks: Boolean, val transparent: Boolean) {
     WALL(true,  false),
