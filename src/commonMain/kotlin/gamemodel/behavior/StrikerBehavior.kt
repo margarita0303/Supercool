@@ -3,7 +3,7 @@ package gamemodel.behavior
 import gamemodel.action.Action
 import gamemodel.action.*
 import gamemodel.world.*
-import math.Vec2
+import math.*
 
 class StrikerBehavior : Behavior {
     override fun setAction(action: Action?) {}
@@ -16,7 +16,7 @@ class StrikerBehavior : Behavior {
             val dir = (world.player.absPos - entity.absPos).getNormilizedWithTileSize()
             Fire(dir)
         } else {
-            Walk(listOf(Vec2(1, 0), Vec2(1, 0), Vec2(1, 0), Vec2(1, 0)).random())
+            Walk(listOf(west, east, north, south).random())
         }
 
     }

@@ -17,81 +17,78 @@ lateinit var health: SpriteAnimation
 //var gameState: GameState = GameState.PLAYING
 
 
-suspend fun main() {
+suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"]) {
     textureWork()
-    val music = resourcesVfs["music/RuinsOfEmpire.mp3"].readMusic()
-    music.play(PlaybackParameters(volume = 0.01))
-
     val world = generateMap()
     val flasks: Array<Sprite> = Array(EntityType.Striker.hp) { Sprite(health).xy(it * tileSize, tileSize) }
 
-    Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"], entry = {
+    val helper = StageHelper(this, world, flasks)
+    helper.addSprites()
+    helper.addControlKeys()
+    helper.setUpHealthPointBar()
+    // Win / Loss Message
+    val winText = text("YOU WIN", textSize = 24.0).xy(400, 500)
+    winText.visible = false
+    val lostText = text("YOU LOSE", textSize = 24.0).xy(400, 500)
+    lostText.visible = false
 
-        val helper = StageHelper(this, world, flasks)
-        helper.addSprites()
-        helper.addControlKeys()
-        helper.setUpHealthPointBar()
-        // Win / Loss Message
-        val winText = text("YOU WIN", textSize = 24.0).xy(400, 500)
-        winText.visible = false
-        val lostText = text("YOU LOSE", textSize = 24.0).xy(400, 500)
-        lostText.visible = false
+    text("Life").xy(0, 0)
 
-        text("Life").xy(0, 0)
-
-        // HP flasks
+    // HP flasks
 
 
-        world.recalculateLight()
-        addFixedUpdater(60.timesPerSecond) {
+    world.recalculateLight()
+    addFixedUpdater(60.timesPerSecond) {
 
-            //winText.visible = gameState == GameState.WON
-            //lostText.visible = gameState == GameState.LOST
+        //winText.visible = gameState == GameState.WON
+        //lostText.visible = gameState == GameState.LOST
 
-            val playerHealth = 5//world.player.life?.current ?: 0
-            helper.updateHealthBarState(playerHealth)
+        val playerHealth = 5//world.player.life?.current ?: 0
+        helper.updateHealthBarState(playerHealth)
 
-            world.passTime()
+        world.passTime()
 
-            world.tiles.forEach { it ->
-                it.sprite.visible = it.lit || it.wasLit
-                it.sprite.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-                it.sprite.playAnimationLooped(it.tileType.animation, spriteDisplayTime = 250.milliseconds)
+        world.tiles.forEach { it ->
+            it.sprite.visible = it.lit || it.wasLit
+            it.sprite.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
+            it.sprite.playAnimationLooped(it.tileType.animation, spriteDisplayTime = 250.milliseconds)
 
-                it.decorSprite?.visible = it.lit || it.wasLit
-                it.decorSprite?.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-                it.decorSprite?.playAnimationLooped(it.decor?.animation, spriteDisplayTime = 250.milliseconds)
-            }
-
-            world.entities.forEach {
-
-                // This does linear interpolation for
-                val diff = Point(
-                    (it.pos.x * tileSize).toDouble() - it.sprite.x,
-                    (it.pos.y * tileSize).toDouble() - it.sprite.y
-                )
-                if (diff.length > 3) {
-                    diff.normalize()
-                    diff.mul(3.0)
-                }
-
-                it.sprite.x += diff.x
-                it.sprite.y += diff.y
-
-                it.sprite.visible = world.tiles[it.pos].lit
-                if (it.isAlive()) {
-                    if (diff.length > 2) {
-                        it.sprite.playAnimationLooped(it.type.moveAnimation, spriteDisplayTime = 250.milliseconds)
-                    } else {
-                        it.sprite.playAnimationLooped(it.type.standAnimation, spriteDisplayTime = 250.milliseconds)
-                    }
-                } else {
-                    it.sprite.stopAnimation()
-                }
-            }
-            world.recalculateLight()
+            it.decorSprite?.visible = it.lit || it.wasLit
+            it.decorSprite?.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
+            it.decorSprite?.playAnimationLooped(it.decor?.animation, spriteDisplayTime = 250.milliseconds)
         }
-    })
+
+        world.entities.forEach {
+
+            // This does linear interpolation for
+            val diff = Point(
+                (it.pos.x * tileSize).toDouble() - it.sprite.x,
+                (it.pos.y * tileSize).toDouble() - it.sprite.y
+            )
+            if (diff.length > 3) {
+                diff.normalize()
+                diff.mul(3.0)
+            }
+
+            it.sprite.x += diff.x
+            it.sprite.y += diff.y
+
+            it.sprite.visible = world.tiles[it.pos].lit
+            if (it.isAlive()) {
+                if (diff.length > 2) {
+                    it.sprite.playAnimationLooped(
+                        it.type.moveAnimation,
+                        spriteDisplayTime = (it.type.timeForMove * 1000).milliseconds
+                    )
+                } else {
+                    it.sprite.playAnimationLooped(it.type.standAnimation, spriteDisplayTime = 250.milliseconds)
+                }
+            } else {
+                it.sprite.stopAnimation()
+            }
+        }
+        world.recalculateLight()
+    }
 }
 
 

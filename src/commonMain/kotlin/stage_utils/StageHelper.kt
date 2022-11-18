@@ -25,10 +25,6 @@ class StageHelper(
     }
 
     fun addControlKeys() {
-        val east = Vec2(1, 0)
-        val north = Vec2(0, -1)
-        val west = Vec2(-1, 0)
-        val south = Vec2(0, 1)
         with(stage) {
             keys {
                 down(Key.RIGHT) {
