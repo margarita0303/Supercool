@@ -9,9 +9,9 @@ enum class EntityType(
         var damage: Int,
         ) {
 
-    Player(100, 0.25, 1.0, 10),
+    Player(100, 0.5, 1.0, 10),
 
-    Striker(100, 0.25, 1.0, 10),
+    Striker(100, 1.0, 1.0, 10),
 
     PistolBullet(1, 0.1, 1.0, 20);
 

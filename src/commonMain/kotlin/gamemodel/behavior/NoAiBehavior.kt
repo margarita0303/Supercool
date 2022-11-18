@@ -1,15 +1,16 @@
 package gamemodel.behavior
 
-import gamemodel.action.Action
-import gamemodel.world.Entity
-import gamemodel.world.World
+import gamemodel.action.*
+import gamemodel.world.*
 
 class NoAiBehavior : Behavior {
 
     private var action: Action? = null
 
     override fun getNextAction(entity: Entity, world: World): Action? {
-        return action
+        val toReturn = action
+        action = null
+        return toReturn
     }
 
     override fun setAction(action: Action?) {
