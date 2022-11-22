@@ -14,18 +14,21 @@ import resource_controllers.*
 import stage_utils.*
 
 lateinit var health: SpriteAnimation
+lateinit var exp: SpriteAnimation
 //var gameState: GameState = GameState.PLAYING
 
 
 suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"]) {
     textureWork()
     val world = generateMap()
-    val flasks: Array<Sprite> = Array(EntityType.Striker.hp) { Sprite(health).xy(it * tileSize, tileSize) }
+    val flasks: Array<Sprite> = Array(6) { Sprite(health).xy(it * tileSize, tileSize) }
+    val expFlasks: Array<Sprite> = Array(6) { Sprite(exp).xy((it + 7) * tileSize, tileSize) }
 
-    val helper = StageHelper(this, world, flasks)
+    val helper = StageHelper(this, world, flasks, expFlasks)
     helper.addSprites()
     helper.addControlKeys()
     helper.setUpHealthPointBar()
+    helper.setUpExpPointBar()
     // Win / Loss Message
     val winText = text("YOU WIN", textSize = 24.0).xy(400, 500)
     winText.visible = false
@@ -33,6 +36,7 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
     lostText.visible = false
 
     text("Life").xy(0, 0)
+    text("Exp").xy(7 * tileSize, 0)
 
     // HP flasks
 
@@ -43,9 +47,9 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
         //winText.visible = gameState == GameState.WON
         //lostText.visible = gameState == GameState.LOST
 
-        val playerHealth = 5//world.player.life?.current ?: 0
-        helper.updateHealthBarState(playerHealth)
-
+        val playerHealth = world.player.getHp()
+        helper.updateHealthBarState(playerHealth, world.player.type.hp)
+        helper.updateExpBarState(world.player.getLevel())
         world.passTime()
 
         world.tiles.forEach { it ->
@@ -75,18 +79,21 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
 
             it.sprite.visible = world.tiles[it.pos].lit
             if (it.isAlive()) {
+                val animSpeedCoef = if(it.player) 1.0 else world.timeSpeed
                 if (diff.length > 2) {
                     it.sprite.playAnimationLooped(
                         it.type.moveAnimation,
-                        spriteDisplayTime = (it.type.timeForMove * 1000).milliseconds
+                        spriteDisplayTime = (it.type.timeForMove * 1000 / animSpeedCoef).milliseconds
                     )
                 } else {
-                    it.sprite.playAnimationLooped(it.type.standAnimation, spriteDisplayTime = 250.milliseconds)
+                    it.sprite.playAnimationLooped(it.type.standAnimation, spriteDisplayTime = (250 / animSpeedCoef).milliseconds)
                 }
             } else {
                 it.sprite.stopAnimation()
+                it.sprite.visible = false
             }
         }
+        world.removeDeadEntities()
         world.recalculateLight()
     }
 }
@@ -99,4 +106,5 @@ suspend fun textureWork() {
     spriteController.initTileTypes()
     spriteController.initDecors()
     health = spriteController.getHealth()
+    exp = spriteController.getExp()
 }

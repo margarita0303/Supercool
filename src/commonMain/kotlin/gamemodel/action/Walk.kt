@@ -21,6 +21,11 @@ class Walk(val dir: Vec2) : Action {
 
         val entitiesOnNextSpace = world.entities.filter { it.pos == nextPos && it.blocks }
         if(entitiesOnNextSpace.isNotEmpty()) {
+            entitiesOnNextSpace.forEach {
+                val res = Melee(it).onPerform(world, entity)
+                if(res is Succeeded && entity.player && !it.isAlive())
+                    entity.plusExp(50)
+            }
             return Failed
         }
 
@@ -36,7 +41,7 @@ class Walk(val dir: Vec2) : Action {
             entity.movingDelay = entity.getMoveTime()
             world.playerMovementTimeEffectDelay = entity.movingDelay
         } else {
-            entity.movingDelay = entity.getMoveTime() / world.timeSpeed
+            entity.movingDelay = entity.getMoveTime()
         }
 
 

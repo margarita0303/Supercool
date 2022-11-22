@@ -13,18 +13,14 @@ class World(
     var playerMovementTimeEffectDelay = 0.0
     var timeSpeed = 1.0
 
-    val bullets: MutableList<Entity> = mutableListOf()
-
     fun passTime() {
         recalculateTimeSpeed()
 
         entities.forEach { entity ->
             entity.behavior?.getNextAction(entity, this)?.onPerform(this, entity)
-            entity.onWorldUpdated()
+            entity.onWorldUpdated(timeSpeed)
         }
-        bullets.forEach { bullet ->
-            bullet.behavior?.getNextAction(bullet, this)?.onPerform(this, bullet)
-        }
+
     }
 
     fun recalculateLight() {
@@ -55,7 +51,13 @@ class World(
 
     private fun recalculateTimeSpeed() {
         playerMovementTimeEffectDelay -= 1.0 / GameConfig.worldUpdateRate
-        val moveCoef = if(playerMovementTimeEffectDelay <= 0) 1.0 else 1.5 // TODO: find function for coef
+        val moveCoef = if(playerMovementTimeEffectDelay <= 0) 1.0 else 4.0 // TODO: find function for coef
         timeSpeed = moveCoef
+    }
+
+    fun removeDeadEntities() {
+        entities.removeIf {
+            !it.isAlive()
+        }
     }
 }

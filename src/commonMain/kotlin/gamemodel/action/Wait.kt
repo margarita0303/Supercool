@@ -8,7 +8,6 @@ import gamemodel.world.World
 class Wait : Action {
 
     override fun onPerform(world: World, entity: Entity): ActionResult {
-        // waste a turn
         return Succeeded
     }
 

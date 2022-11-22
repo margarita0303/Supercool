@@ -5,7 +5,7 @@ import gamemodel.action.*
 import gamemodel.world.*
 import math.*
 
-class StrikerBehavior : Behavior {
+class AgressiveBehavior : Behavior {
     override fun setAction(action: Action?) {}
 
     override fun getNextAction(entity: Entity, world: World): Action {
@@ -13,8 +13,7 @@ class StrikerBehavior : Behavior {
         // see enemy
         val isVisible = isSecondEntityVisibleByFirst(entity.pos, world.player.pos, 10.0, world)
         return if (isVisible) { //charge
-            val dir = (world.player.absPos - entity.absPos).getNormilizedWithTileSize()
-            Fire(dir)
+            WalkToPoint(world.player.pos)
         } else {
             Walk(listOf(west, east, north, south).random())
         }
