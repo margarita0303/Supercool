@@ -30,14 +30,29 @@ class StageHelper(
                 down(Key.RIGHT) {
                     world.player.behavior?.setAction(Walk(east))
                 }
+                down(Key.D) {
+                    world.player.behavior?.setAction(Walk(east))
+                }
                 down(Key.UP) {
+                    world.player.behavior?.setAction(Walk(north))
+                }
+                down(Key.W) {
                     world.player.behavior?.setAction(Walk(north))
                 }
                 down(Key.LEFT) {
                     world.player.behavior?.setAction(Walk(west))
                 }
+                down(Key.A) {
+                    world.player.behavior?.setAction(Walk(west))
+                }
                 down(Key.DOWN) {
                     world.player.behavior?.setAction(Walk(south))
+                }
+                down(Key.S) {
+                    world.player.behavior?.setAction(Walk(south))
+                }
+                down(Key.E) {
+                    world.player.behavior?.setAction(Loot())
                 }
             }
         }

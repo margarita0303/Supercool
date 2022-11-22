@@ -66,7 +66,7 @@ fun generateMap(): World {
             )
         )
     ) { x, y ->
-        decor[x, y] = arrayOf(Decor.WALL_SKELETON, Decor.TORCH, Decor.GREEN_BANNER, Decor.RED_BANNER).random()
+        decor[x, y] = arrayOf(Decor.WALL_SKELETON, Decor.TORCH, Decor.GREEN_BANNER, Decor.RED_BANNER, Decor.CHEST).random()
     }
 
     MapGen2d.fill(

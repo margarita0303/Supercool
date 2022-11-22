@@ -43,7 +43,7 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
         //winText.visible = gameState == GameState.WON
         //lostText.visible = gameState == GameState.LOST
 
-        val playerHealth = 5//world.player.life?.current ?: 0
+        val playerHealth = world.player.type.hp / 10
         helper.updateHealthBarState(playerHealth)
 
         world.passTime()
