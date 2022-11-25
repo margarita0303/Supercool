@@ -13,6 +13,8 @@ class NoAiBehavior : Behavior {
         return toReturn
     }
 
+    override fun onWorldUpdated() {}
+
     override fun setAction(action: Action?) {
         this.action = action
     }

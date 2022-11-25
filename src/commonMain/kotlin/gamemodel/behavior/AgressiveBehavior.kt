@@ -20,4 +20,6 @@ class AgressiveBehavior : Behavior {
 
     }
 
+    override fun onWorldUpdated() {}
+
 }

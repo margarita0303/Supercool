@@ -10,4 +10,6 @@ class PassiveBehavior: Behavior {
     override fun getNextAction(entity: Entity, world: World): Action? {
         return Wait()
     }
+
+    override fun onWorldUpdated() {}
 }

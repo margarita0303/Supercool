@@ -20,7 +20,9 @@ class Melee(
             return Failed
         }
 
-        victim.damage(entity.meleeAttack())
+        val (damage, effect) = entity.meleeAttack()
+        victim.damage(damage)
+        victim.applyBehaviorEffect(effect)
         entity.meleeDelay = entity.getMeleeTime()
 
         return Succeeded

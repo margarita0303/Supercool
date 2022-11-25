@@ -12,6 +12,8 @@ interface Behavior {
     // acts on them
     fun getNextAction(entity: Entity, world: World): Action?
 
+    fun onWorldUpdated()
+
 }
 
 
