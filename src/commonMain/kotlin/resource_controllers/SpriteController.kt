@@ -57,6 +57,10 @@ class SpriteController {
         return getAnimationOfTileSize(tileMap, 0, 7)
     }
 
+    fun getExp(): SpriteAnimation {
+        return getAnimationOfTileSize(tileMap, 0, 8)
+    }
+
     fun setUpEntityAnimations() {
         EntityType.Player.apply {
             standAnimation = getAnimationOfTileSize(spriteSheet, 5, 0, 6, 1)

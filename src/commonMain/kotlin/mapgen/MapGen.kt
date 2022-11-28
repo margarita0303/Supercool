@@ -25,9 +25,11 @@ fun generateMap(): World {
     val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true, stabber = true)
     val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
     val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
+    // temp line for demo
+    val enemy = Entity(Vec2(7, 7), EntityType.Striker, AgressiveBehavior(), player = false, blocks = true, stabber = true)
 
     val roomCenters = mutableListOf<Vec2>()
-    val entities = mutableListOf(player)
+    val entities = mutableListOf(player, enemy)
 
     (1..MAX_ROOMS).forEach {
         val w = (ROOM_MIN_SIZE..ROOM_MAX_SIZE).random()
@@ -170,12 +172,15 @@ fun generateMap(): World {
             //set player start
             player.pos = center
             player.sprite.xy(center.x * tileSize, center.y * tileSize)
+            // temp lines for demo
+            enemy.pos = center.let { Vec2(it.x + 1, it.y + 1) }
+            enemy.sprite.xy(enemy.pos.x * tileSize, enemy.pos.y * tileSize)
         } else {
             //TODO: add objects
             //placeObjects(map, newRoom,  MAX_ROOM_MONSTERS, MAX_ROOM_ITEMS)
             val surrounds = center.mooreNeighborhood().filter { !map[it].blocks }.shuffled()
             repeat((0 until min(4, surrounds.size)).random()) {
-                entities += Entity(surrounds[it], enemies().random(), StrikerBehavior(), blocks = true)
+                entities += Entity(surrounds[it], enemies().random(), AgressiveBehavior(), blocks = true)
             }
         }
     }

@@ -1,7 +1,9 @@
 package gamemodel.world
 
-enum class WeaponItem(val meleeDamage: Int, val timeForMelee: Double, val timeForFire: Double, val range: Int, val bulletType: EntityType?) {
-    Pistol(10,0.0, 0.5, 10, EntityType.PistolBullet)
+import gamemodel.behavior.*
+
+enum class WeaponItem(val meleeDamage: Int, val timeForMelee: Double, val effect: BehaviorChanger, val prob: Double) {
+    Sword(60,0.5, ConfusingBehaviorChanger(), 0.1)
 }
 
 enum class EquipmentItem(val protection: Double, val speed: Double) {

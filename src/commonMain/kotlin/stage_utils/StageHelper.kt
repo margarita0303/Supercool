@@ -12,6 +12,7 @@ class StageHelper(
     private val stage: Stage,
     private val world: World,
     private val flasks: Array<Sprite>,
+    private val expFlasks: Array<Sprite>,
 ) {
     fun addSprites() {
         with(stage) {
@@ -49,9 +50,23 @@ class StageHelper(
         }
     }
 
-    fun updateHealthBarState(playerHealth: Int) {
+    fun setUpExpPointBar() {
+        with(stage) {
+            expFlasks.forEach { addChild(it) }
+        }
+    }
+
+    fun updateHealthBarState(playerHealth: Int, maxPlayerHealth: Int) {
+        val normalizedHp = kotlin.math.ceil ((playerHealth / maxPlayerHealth.toDouble()) * flasks.size)
         flasks.fastForEachWithIndex { index, flask ->
-            flask.visible = index < playerHealth
+            flask.visible = index < normalizedHp
+            flask.playAnimationLooped()
+        }
+    }
+
+    fun updateExpBarState(playerLevel: Int) {
+        expFlasks.fastForEachWithIndex { index, flask ->
+            flask.visible = index < playerLevel
             flask.playAnimationLooped()
         }
     }
