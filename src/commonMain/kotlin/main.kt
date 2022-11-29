@@ -79,14 +79,17 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
 
             it.sprite.visible = world.tiles[it.pos].lit
             if (it.isAlive()) {
-                val animSpeedCoef = if(it.player) 1.0 else world.timeSpeed
+                val animSpeedCoef = if (it.player) 1.0 else world.timeSpeed
                 if (diff.length > 2) {
                     it.sprite.playAnimationLooped(
                         it.type.moveAnimation,
                         spriteDisplayTime = (it.type.timeForMove * 1000 / animSpeedCoef).milliseconds
                     )
                 } else {
-                    it.sprite.playAnimationLooped(it.type.standAnimation, spriteDisplayTime = (250 / animSpeedCoef).milliseconds)
+                    it.sprite.playAnimationLooped(
+                        it.type.standAnimation,
+                        spriteDisplayTime = (250 / animSpeedCoef).milliseconds
+                    )
                 }
             } else {
                 it.sprite.stopAnimation()
