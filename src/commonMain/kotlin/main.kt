@@ -5,7 +5,6 @@ import com.soywiz.klock.*
 import com.soywiz.korge.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.*
-import com.soywiz.korma.geom.*
 import mapgen.*
 import resource_controllers.*
 import stage_utils.*
@@ -50,51 +49,11 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
         world.passTime()
 
         world.tiles.forEach { it ->
-            it.sprite.visible = it.lit || it.wasLit
-            it.sprite.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-            it.sprite.playAnimationLooped(it.tileType.animation, spriteDisplayTime = 500.milliseconds / world.timeSpeed)
-
-            it.decorSprite?.visible = it.lit || it.wasLit
-            it.decorSprite?.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-            it.decorSprite?.playAnimationLooped(
-                it.decor?.animation,
-                spriteDisplayTime = 500.milliseconds / world.timeSpeed
-            )
+            it.updateSprites(world.timeSpeed)
         }
 
         world.entities.forEach {
-
-            // This does linear interpolation for
-            val diff = Point(
-                (it.pos.x * tileSize).toDouble() - it.sprite.x,
-                (it.pos.y * tileSize).toDouble() - it.sprite.y
-            )
-            if (diff.length > 3) {
-                diff.normalize()
-                diff.mul(3.0)
-            }
-
-            it.sprite.x += diff.x
-            it.sprite.y += diff.y
-
-            it.sprite.visible = world.tiles[it.pos].lit
-            if (it.isAlive()) {
-                val animSpeedCoef = if (it.player) 1.0 else world.timeSpeed
-                if (diff.length > 2) {
-                    it.sprite.playAnimationLooped(
-                        it.type.moveAnimation,
-                        spriteDisplayTime = (it.type.timeForMove * 1000 / animSpeedCoef).milliseconds
-                    )
-                } else {
-                    it.sprite.playAnimationLooped(
-                        it.type.standAnimation,
-                        spriteDisplayTime = (250 / animSpeedCoef).milliseconds
-                    )
-                }
-            } else {
-                it.sprite.stopAnimation()
-                it.sprite.visible = false
-            }
+            it.updateSprite(world.tiles[it.pos].lit, world.timeSpeed)
         }
         world.removeDeadEntities()
         world.recalculateLight()

@@ -1,11 +1,12 @@
 package gamemodel.world
 
 import GameConfig
-import com.soywiz.korge.view.Sprite
-import com.soywiz.korge.view.xy
-import math.Vec2
 import GameConfig.tileSize
+import com.soywiz.klock.*
+import com.soywiz.korge.view.*
+import com.soywiz.korma.geom.*
 import gamemodel.behavior.*
+import math.*
 import kotlin.math.*
 import kotlin.random.*
 
@@ -15,11 +16,11 @@ class Entity(
     var behavior: Behavior,
     val sprite: Sprite = Sprite(type.standAnimation).xy(pos.x * tileSize, pos.y * tileSize),
     private val stats: Stats = Stats(type.hp, 0.0, 1.0, 0),
-    val inventory: Inventory = Inventory(null, null, null),
+    private val inventory: Inventory = Inventory(null, null, null),
     val player: Boolean = false,
     var focusAbsPos: Vec2 = Vec2(0, 0),
     var blocks: Boolean = false,
-    val stabber: Boolean = false
+    val stabber: Boolean = false,
 ) {
     var movingDelay: Double = 0.0
     val canMoveNow: Boolean
@@ -42,7 +43,7 @@ class Entity(
             pos = field.toTilePos()
         }
 
-    fun isAlive(): Boolean = stats.hp  > 0
+    fun isAlive(): Boolean = stats.hp > 0
 
     fun getHp(): Int = stats.hp
 
@@ -61,7 +62,7 @@ class Entity(
     fun meleeAttack(): Attack {
         val damage = ((inventory.weapon?.meleeDamage ?: type.damage) * stats.damageMultiplier).toInt()
         val effect = inventory.weapon?.let {
-            if(Random.nextDouble() < it.prob) it.effect else null
+            if (Random.nextDouble() < it.prob) it.effect else null
         }
         return Attack(damage, effect)
     }
@@ -75,10 +76,10 @@ class Entity(
     }
 
     fun onWorldUpdated(timeSpeed: Double) {
-        if(movingDelay > 0)
+        if (movingDelay > 0)
             movingDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
 
-        if(meleeDelay > 0)
+        if (meleeDelay > 0)
             meleeDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
 
         behavior.onWorldUpdated()
@@ -88,18 +89,18 @@ class Entity(
         val prevLevel = getLevel()
         stats.exp += exp
         val newLevel = getLevel()
-        if(newLevel in (prevLevel + 1)..maxLevel)
+        if (newLevel in (prevLevel + 1)..maxLevel)
             levelUp()
     }
 
-    fun getLevel() : Int {
+    fun getLevel(): Int {
         return stats.exp / levelExp + 1
     }
 
     fun applyBehaviorEffect(effect: BehaviorChanger?) {
-       effect?.let {
+        effect?.let {
             behavior = it.getChangedBehavior(behavior)
-       }
+        }
     }
 
     private fun levelUp() {
@@ -107,6 +108,40 @@ class Entity(
         type.damage += 5
     }
 
+    fun updateSprite(isPositionLit: Boolean, timeSpeed: Double) {
+        val it = this
+        // This does linear interpolation for
+        val diff = Point(
+            (it.pos.x * tileSize).toDouble() - it.sprite.x,
+            (it.pos.y * tileSize).toDouble() - it.sprite.y
+        )
+        if (diff.length > 3) {
+            diff.normalize()
+            diff.mul(3.0)
+        }
+
+        it.sprite.x += diff.x
+        it.sprite.y += diff.y
+
+        it.sprite.visible = isPositionLit
+        if (it.isAlive()) {
+            val animSpeedCoef = if (it.player) 1.0 else timeSpeed
+            if (diff.length > 2) {
+                it.sprite.playAnimationLooped(
+                    it.type.moveAnimation,
+                    spriteDisplayTime = (it.type.timeForMove * 1000 / animSpeedCoef).milliseconds
+                )
+            } else {
+                it.sprite.playAnimationLooped(
+                    it.type.standAnimation,
+                    spriteDisplayTime = (250 / animSpeedCoef).milliseconds
+                )
+            }
+        } else {
+            it.sprite.stopAnimation()
+            it.sprite.visible = false
+        }
+    }
 
 
     data class Stats(var hp: Int, var protection: Double, var damageMultiplier: Double, var exp: Int)

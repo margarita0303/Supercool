@@ -20,12 +20,11 @@ class WorldGenerator {
 
 
     private val enemies = listOf(EntityType.Striker)
+    private val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
+    private val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
 
     fun generateMap(): World {
         val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true, stabber = true)
-        val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
-        val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
-
         val roomCenters = mutableListOf<Vec2>()
         val entities = mutableListOf(player)
 
@@ -45,60 +44,11 @@ class WorldGenerator {
 
         }
 
-        // set anything touching the rooms into a wall
-        map.fill(
-            AndPredicate2d(
-                arrayOf(
-                    CellEquals2d(TileType.DIRT),
-                    CellNearCell2d(TileType.FLOOR)
-                )
-            ),
-            DrawCell2d(TileType.WALL)
-        )
+        setTouchingRoomsToWall()
+        decorWalls()
+        decorFloor()
+        addBookshelves()
 
-        // room wall decals
-        map.fill(
-            AndPredicate2d(
-                arrayOf(
-                    CellEquals2d(TileType.WALL),
-                    CellNearCell2d(TileType.FLOOR),
-                    RandomPredicate2d(0.05f)
-                )
-            )
-        ) { x: Int, y: Int ->
-            decor[x, y] = arrayOf(Decor.WALL_SKELETON, Decor.TORCH, Decor.GREEN_BANNER, Decor.RED_BANNER).random()
-        }
-
-        map.fill(
-            AndPredicate2d(
-                arrayOf(
-                    CellEquals2d(TileType.FLOOR),
-                    CellNotNearCell2d(TileType.WALL),
-                    RandomPredicate2d(0.05f)
-                )
-            )
-        ) { x: Int, y: Int ->
-            decor[x, y] = arrayOf(Decor.TABLE, Decor.BARREL).random()
-        }
-
-        map.fill(
-            AndPredicate2d(
-                arrayOf(
-                    CellEquals2d(TileType.FLOOR),
-                    CellNearCell2d(TileType.WALL),
-                    RandomPredicate2d(0.05f)
-                )
-            ),
-            DrawCell2d(TileType.BOOKSHELF)
-        )
-
-
-        // Link them up.  Dig tunnels using a*
-        // anything that is a wall gets turned to a door
-
-        // Cutting paths
-        // Link them up.  Dig tunnels using a*
-        // anything that is a wall gets turned to a door
 
         for (roomCenterFrom in roomCenters) {
             for (roomCenterTo in roomCenters) {
@@ -122,7 +72,6 @@ class WorldGenerator {
                     end = roomCenterTo
                 )
 
-//            val fullPath2d: FullPath2d = pathFinder2d.findPath(hallwayMover2d, roomCenterFrom.x, roomCenterFrom.y, roomCenterTo.x, roomCenterTo.y)
                 if (fullPath2d != null) {
                     for (currentStep in fullPath2d) {
                         val tile: TileType = map[currentStep]
@@ -146,7 +95,7 @@ class WorldGenerator {
                     CellNearCell2d(TileType.DOOR_CLOSED)
                 )
             ),
-            DrawCell2d(TileType.FLOOR)
+            DrawCell2d(TileType.WALL)
         )
 
         //surround any halls with wall
@@ -163,7 +112,6 @@ class WorldGenerator {
         // Fill rooms with monstrosities
         roomCenters.forEachIndexed { index, center ->
             if (index == 0) {
-                //set player start
                 player.pos = center
                 player.sprite.xy(center.x * tileSize, center.y * tileSize)
             } else {
@@ -187,6 +135,59 @@ class WorldGenerator {
             entities = entities,
             player = player
         )
+    }
+
+    private fun addBookshelves() {
+        map.fill(
+            AndPredicate2d(
+                arrayOf(
+                    CellEquals2d(TileType.FLOOR),
+                    CellNearCell2d(TileType.WALL),
+                    RandomPredicate2d(0.05f)
+                )
+            ),
+            DrawCell2d(TileType.BOOKSHELF)
+        )
+    }
+
+    private fun decorFloor() {
+        map.fill(
+            AndPredicate2d(
+                arrayOf(
+                    CellEquals2d(TileType.FLOOR),
+                    CellNearCell2d(TileType.WALL).negated(),
+                    RandomPredicate2d(0.05f)
+                )
+            )
+        ) { x: Int, y: Int ->
+            decor[x, y] = arrayOf(Decor.TABLE, Decor.BARREL).random()
+        }
+    }
+
+    private fun setTouchingRoomsToWall() {
+        map.fill(
+            AndPredicate2d(
+                arrayOf(
+                    CellEquals2d(TileType.DIRT),
+                    CellNearCell2d(TileType.FLOOR)
+                )
+            ),
+            DrawCell2d(TileType.WALL)
+        )
+    }
+
+    private fun decorWalls() {
+        map.fill(
+            AndPredicate2d(
+                arrayOf(
+                    CellEquals2d(TileType.WALL),
+                    CellNearCell2d(TileType.FLOOR),
+                    RandomPredicate2d(0.05f)
+                )
+            )
+        ) { x: Int, y: Int ->
+            decor[x, y] = arrayOf(Decor.WALL_SKELETON, Decor.TORCH, Decor.GREEN_BANNER, Decor.RED_BANNER).random()
+        }
     }
 
     private fun digRoom(

@@ -3,6 +3,7 @@ package gamemodel.world
 import GameConfig.tileSize
 import com.soywiz.klock.*
 import com.soywiz.korge.view.*
+import com.soywiz.korim.color.*
 import game.world.*
 
 class Cell(
@@ -24,4 +25,16 @@ class Cell(
     }
 
     fun isBlocked(): Boolean = tileType.blocks || decor?.blocks ?: false
+    fun updateSprites(timeSpeed: Double) {
+        sprite.visible = lit || wasLit
+        sprite.colorMul = if (!lit && wasLit) Colors.DARKGRAY else Colors.WHITE
+        sprite.playAnimationLooped(tileType.animation, spriteDisplayTime = 500.milliseconds / timeSpeed)
+
+        decorSprite?.visible = lit || wasLit
+        decorSprite?.colorMul = if (!lit && wasLit) Colors.DARKGRAY else Colors.WHITE
+        decorSprite?.playAnimationLooped(
+            decor?.animation,
+            spriteDisplayTime = 500.milliseconds / timeSpeed
+        )
+    }
 }
