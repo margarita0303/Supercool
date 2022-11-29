@@ -1,11 +1,10 @@
 package gamemodel.behavior
 
-import gamemodel.action.Action
 import gamemodel.action.*
 import gamemodel.world.*
 import math.*
 
-class AgressiveBehavior : Behavior {
+class AggressiveBehavior : Behavior {
     override fun setAction(action: Action?) {}
 
     override fun getNextAction(entity: Entity, world: World): Action {

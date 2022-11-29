@@ -1,9 +1,8 @@
 package gamemodel.world
 
 import GameConfig
-import mathutils.Matrix2d
-import math.getEuclideanDistance
-import math.los
+import math.*
+import mathutils.*
 
 class World(
     val tiles: Matrix2d<Cell>,
@@ -17,7 +16,7 @@ class World(
         recalculateTimeSpeed()
 
         entities.forEach { entity ->
-            entity.behavior?.getNextAction(entity, this)?.onPerform(this, entity)
+            entity.behavior.getNextAction(entity, this)?.onPerform(this, entity)
             entity.onWorldUpdated(timeSpeed)
         }
 

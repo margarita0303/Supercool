@@ -1,14 +1,14 @@
 package math
 
-import mathutils.Matrix2d
+import mathutils.*
 
 fun findPath2d(
-        size: Vec2,
-        cost: (Vec2) -> Double,
-        heuristic: (Vec2, Vec2) -> Double,
-        neighbors: (Vec2) -> List<Vec2>,
-        start: Vec2,
-        end: Vec2
+    size: Vec2,
+    cost: (Vec2) -> Double,
+    heuristic: (Vec2, Vec2) -> Double,
+    neighbors: (Vec2) -> List<Vec2>,
+    start: Vec2,
+    end: Vec2,
 ): List<Vec2>? {
 
     val costs = Matrix2d(size.x, size.y) { _, _ -> Double.MAX_VALUE }
@@ -25,20 +25,7 @@ fun findPath2d(
     while (openSet.isNotEmpty()) {
 
         // Grab the next node with the lowest cost
-        val cheapestNode: Vec2 = openSet.minBy { fScore[it] }!!
-
-        if (cheapestNode == end) {
-            // target found, we have a path
-            val path = mutableListOf(cheapestNode)
-
-            var node = cheapestNode
-            while (parent[node] != null) {
-                node = parent[node]!!
-                path.add(node)
-            }
-            return path.reversed()
-        }
-
+        val cheapestNode: Vec2 = openSet.minBy { fScore[it] }
         openSet.remove(cheapestNode)
         closeSet.add(cheapestNode)
 
@@ -67,8 +54,17 @@ fun findPath2d(
             }
         }
     }
+    return if (closeSet.contains(end)) {
+        val path = mutableListOf(end)
 
-    // could not find a path
-    return null
+        var node = end
+        while (parent[node] != null) {
+            node = parent[node]!!
+            path.add(node)
+        }
+        path.reversed()
+    } else {
+        null
+    }
 
 }

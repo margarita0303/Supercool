@@ -1,23 +1,25 @@
 package math
 
 import GameConfig.tileSize
-import mathutils.*
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 val east = Vec2(1, 0)
 val north = Vec2(0, -1)
 val west = Vec2(-1, 0)
 val south = Vec2(0, 1)
 
-open class Vec2(val x: Int, val y: Int) {
+data class Vec2(val x: Int, val y: Int) {
+
 
     operator fun plus(dir: Vec2): Vec2 = get(x + dir.x, y + dir.y)
 
 
+    operator fun plus(e: Int): Vec2 = get(x + e, y + e)
+
     operator fun minus(dir: Vec2): Vec2 = get(x - dir.x, y - dir.y)
+
+
+    operator fun minus(e: Int): Vec2 = get(x - e, y - e)
 
     operator fun times(c: Double): Vec2 = Vec2((x * c).toInt(), (y * c).toInt())
 
@@ -33,11 +35,22 @@ open class Vec2(val x: Int, val y: Int) {
         return Vec2(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2)
     }
 
-    fun getNormilizedWithTileSize() : Vec2 {
+    fun getNormilizedWithTileSize(): Vec2 {
         val norm = sqrt(x.toDouble().pow(2) + y.toDouble().pow(2))
         return Vec2((x / norm * tileSize).toInt(), (y / norm * tileSize).toInt())
     }
 
+
+    operator fun rangeTo(other: Vec2): Sequence<Vec2> {
+        val saved = this
+        return sequence {
+            for (x in saved.x..other.x) {
+                for (y in saved.y..other.y) {
+                    yield(Vec2(x, y))
+                }
+            }
+        }
+    }
 
     companion object {
 
@@ -46,7 +59,8 @@ open class Vec2(val x: Int, val y: Int) {
         private const val offset = 4
         private val size: Int = 32
         private val actualSize = size + 2 * offset
-        private val pool = Array((actualSize * actualSize)) { i -> Vec2(i % (actualSize) - offset, i / actualSize - offset) }
+        private val pool =
+            Array((actualSize * actualSize)) { i -> Vec2(i % (actualSize) - offset, i / actualSize - offset) }
 
         operator fun get(x: Int, y: Int): Vec2 {
 
@@ -65,19 +79,19 @@ open class Vec2(val x: Int, val y: Int) {
 
     // Includes the center point
     fun inclusiveVonNeumanNeighborhood(): List<Vec2> = listOf(
-            this,
-            Vec2[x, y + 1],
-            Vec2[x + 1, y],
-            Vec2[x, y - 1],
-            Vec2[x - 1, y]
+        this,
+        Vec2[x, y + 1],
+        Vec2[x + 1, y],
+        Vec2[x, y - 1],
+        Vec2[x - 1, y]
     )
 
     // Excludes center point
     fun vonNeumanNeighborhood(): List<Vec2> = listOf(
-            Vec2[x, y + 1],
-            Vec2[x + 1, y],
-            Vec2[x, y - 1],
-            Vec2[x - 1, y]
+        Vec2[x, y + 1],
+        Vec2[x + 1, y],
+        Vec2[x, y - 1],
+        Vec2[x - 1, y]
     )
 
     // Includes the center point
@@ -109,5 +123,8 @@ fun getChebyshevDistance(pos1: Vec2, pos2: Vec2): Int = getChebyshevDistance(pos
 fun getChebyshevDistance(x1: Int, y1: Int, x2: Int, y2: Int): Int = max(abs(x1 - x2), abs(y1 - y2))
 
 
-fun getEuclideanDistance(pos1: Vec2, pos2: Vec2): Double = getEuclideanDistance(pos1.x.toDouble(), pos1.y.toDouble(), pos2.x.toDouble(), pos2.y.toDouble())
-fun getEuclideanDistance(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt((x1 - x2).pow(2.0) + (y1 - y2).pow(2.0))
+fun getEuclideanDistance(pos1: Vec2, pos2: Vec2): Double =
+    getEuclideanDistance(pos1.x.toDouble(), pos1.y.toDouble(), pos2.x.toDouble(), pos2.y.toDouble())
+
+fun getEuclideanDistance(x1: Double, y1: Double, x2: Double, y2: Double): Double =
+    sqrt((x1 - x2).pow(2.0) + (y1 - y2).pow(2.0))

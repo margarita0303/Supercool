@@ -17,9 +17,9 @@ class StageHelper(
     fun addSprites() {
         with(stage) {
             world.tiles.forEach { tile ->
-                addChild(tile.sprite)
-                if (tile.decorSprite != null)
-                    addChild(tile.decorSprite)
+                tile.getAllSprites().forEach { sprite ->
+                    addChild(sprite)
+                }
             }
             world.entities.forEach { addChild(it.sprite) }
         }
@@ -29,16 +29,19 @@ class StageHelper(
         with(stage) {
             keys {
                 down(Key.RIGHT) {
-                    world.player.behavior?.setAction(Walk(east))
+                    world.player.behavior.setAction(Walk(east))
                 }
                 down(Key.UP) {
-                    world.player.behavior?.setAction(Walk(north))
+                    world.player.behavior.setAction(Walk(north))
                 }
                 down(Key.LEFT) {
-                    world.player.behavior?.setAction(Walk(west))
+                    world.player.behavior.setAction(Walk(west))
                 }
                 down(Key.DOWN) {
-                    world.player.behavior?.setAction(Walk(south))
+                    world.player.behavior.setAction(Walk(south))
+                }
+                down(Key.E) {
+                    world.player.behavior.setAction(InteractWithDoors())
                 }
             }
         }
@@ -57,7 +60,7 @@ class StageHelper(
     }
 
     fun updateHealthBarState(playerHealth: Int, maxPlayerHealth: Int) {
-        val normalizedHp = kotlin.math.ceil ((playerHealth / maxPlayerHealth.toDouble()) * flasks.size)
+        val normalizedHp = kotlin.math.ceil((playerHealth / maxPlayerHealth.toDouble()) * flasks.size)
         flasks.fastForEachWithIndex { index, flask ->
             flask.visible = index < normalizedHp
             flask.playAnimationLooped()
