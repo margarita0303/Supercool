@@ -60,7 +60,7 @@ class StageHelper(
     }
 
     fun updateHealthBarState(playerHealth: Int, maxPlayerHealth: Int) {
-        val normalizedHp = kotlin.math.ceil ((playerHealth / maxPlayerHealth.toDouble()) * flasks.size)
+        val normalizedHp = kotlin.math.ceil((playerHealth / maxPlayerHealth.toDouble()) * flasks.size)
         flasks.fastForEachWithIndex { index, flask ->
             flask.visible = index < normalizedHp
             flask.playAnimationLooped()
