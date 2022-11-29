@@ -1,9 +1,10 @@
 package gamemodel.action
 
-import gamemodel.world.Entity
-import gamemodel.world.World
+import game.world.*
+import gamemodel.world.*
 //import gameState
 import math.Vec2
+import kotlin.random.*
 
 
 class Walk(val dir: Vec2) : Action {
@@ -24,6 +25,19 @@ class Walk(val dir: Vec2) : Action {
                 Melee(it).onPerform(world, entity)
             }
             return Failed
+        }
+
+        if (world.tiles[nextPos].decor == Decor.CHEST) {
+            world.tiles[nextPos].decor = Decor.CHEST_OPEN
+            val randomValue = Random.nextInt() % 2
+            if (randomValue == 0) {
+                val weaponItem = WeaponItem.values().toList().shuffled().first()
+                world.collectableEntities.add(Collectable(nextPos, weaponItem, null))
+            }
+            else if (randomValue == 1) {
+                val equipmentItem = EquipmentItem.values().toList().shuffled().first()
+                world.collectableEntities.add(Collectable(nextPos, null, equipmentItem))
+            }
         }
 
 

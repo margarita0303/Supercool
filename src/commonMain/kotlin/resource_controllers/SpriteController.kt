@@ -26,6 +26,8 @@ class SpriteController(private val stage: Stage) {
     private var flasks: Array<Sprite> = arrayOf()
     private var expFlasks: Array<Sprite> = arrayOf()
 
+    private lateinit var armor: Bitmap
+    private lateinit var weapon: Bitmap
 
     suspend fun initBitmaps() {
         /**
@@ -33,6 +35,8 @@ class SpriteController(private val stage: Stage) {
          */
         tileMap = resourcesVfs["tilemap${tileSize}px.png"].readBitmap()
         spriteSheet = resourcesVfs["spritesheet${tileSize}px.png"].readBitmap()
+        armor = resourcesVfs["armor${tileSize}px.png"].readBitmap()
+        weapon = resourcesVfs["weapon${tileSize}px.png"].readBitmap()
     }
 
     private fun getAnimationOfTileSize(
@@ -102,7 +106,6 @@ class SpriteController(private val stage: Stage) {
         }
     }
 
-
     fun setUpEntitySprites(world: World) {
         EntityType.values().forEach {
             when (it) {
@@ -163,6 +166,18 @@ class SpriteController(private val stage: Stage) {
             sprite.stopAnimation()
             sprite.visible = false
         }
+    }
+
+
+    fun initCollectableTypes() {
+        EquipmentItem.HELMET.animation = getAnimationOfTileSize(armor, 0, 0)
+        EquipmentItem.SCAPULAR.animation = getAnimationOfTileSize(armor, 0, 1)
+        EquipmentItem.BODY_ARMOR.animation = getAnimationOfTileSize(armor, 0, 2)
+        EquipmentItem.PANTS.animation = getAnimationOfTileSize(armor, 0, 3)
+        EquipmentItem.SHOES.animation = getAnimationOfTileSize(armor, 0, 4)
+        WeaponItem.SWORD.animation = getAnimationOfTileSize(weapon, 1, 0)
+        WeaponItem.AX.animation = getAnimationOfTileSize(weapon, 7, 5)
+        WeaponItem.TRIDENT.animation = getAnimationOfTileSize(weapon, 1, 10)
     }
 
     private fun getHealthSprite(): SpriteAnimation {
