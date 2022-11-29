@@ -52,11 +52,14 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
         world.tiles.forEach { it ->
             it.sprite.visible = it.lit || it.wasLit
             it.sprite.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-            it.sprite.playAnimationLooped(it.tileType.animation, spriteDisplayTime = 250.milliseconds)
+            it.sprite.playAnimationLooped(it.tileType.animation, spriteDisplayTime = 500.milliseconds / world.timeSpeed)
 
             it.decorSprite?.visible = it.lit || it.wasLit
             it.decorSprite?.colorMul = if (!it.lit && it.wasLit) Colors.DARKGRAY else Colors.WHITE
-            it.decorSprite?.playAnimationLooped(it.decor?.animation, spriteDisplayTime = 250.milliseconds)
+            it.decorSprite?.playAnimationLooped(
+                it.decor?.animation,
+                spriteDisplayTime = 500.milliseconds / world.timeSpeed
+            )
         }
 
         world.entities.forEach {
