@@ -17,9 +17,9 @@ class StageHelper(
     fun addSprites() {
         with(stage) {
             world.tiles.forEach { tile ->
-                addChild(tile.sprite)
-                if (tile.decorSprite != null)
-                    addChild(tile.decorSprite)
+                tile.getAllSprites().forEach { sprite ->
+                    addChild(sprite)
+                }
             }
             world.entities.forEach { addChild(it.sprite) }
         }

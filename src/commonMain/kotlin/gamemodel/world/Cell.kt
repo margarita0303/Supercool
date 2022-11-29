@@ -11,17 +11,19 @@ class Cell(
     y: Int,
     var tileType: TileType,
     var decor: Decor? = null,
-    val sprite: Sprite = Sprite(tileType.animation).xy(x * tileSize, y * tileSize),
-    val decorSprite: Sprite? = if (decor != null) Sprite(decor.animation).xy(
+    private val sprite: Sprite = Sprite(tileType.animation).xy(x * tileSize, y * tileSize),
+    private val decorSprite: Sprite? = if (decor != null) Sprite(decor.animation).xy(
         x * tileSize,
         y * tileSize
     ) else null,
     var lit: Boolean = false,
     var wasLit: Boolean = false,
 ) {
-    fun rebuild() {
-        sprite.playAnimationLooped(tileType.animation, spriteDisplayTime = 250.milliseconds)
-        decorSprite?.playAnimationLooped(decor?.animation, spriteDisplayTime = 250.milliseconds)
+    fun getAllSprites(): List<Sprite> {
+        val list = mutableListOf(sprite)
+        if (decorSprite != null)
+            list.add(decorSprite)
+        return list
     }
 
     fun isBlocked(): Boolean = tileType.blocks || decor?.blocks ?: false
