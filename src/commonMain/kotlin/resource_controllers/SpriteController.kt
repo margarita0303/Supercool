@@ -38,7 +38,7 @@ class SpriteController {
         TileType.DIRT.animation = getAnimationOfTileSize(tileMap, 2, 5)
         TileType.BOOKSHELF.animation = getAnimationOfTileSize(tileMap, 0, 2)
         TileType.DOOR_CLOSED.animation = getAnimationOfTileSize(tileMap, 5, 7)
-        TileType.DOOR_OPEN.animation = getAnimationOfTileSize(tileMap, 1, 3)
+        TileType.DOOR_OPEN.animation = getAnimationOfTileSize(tileMap, 4, 6)
     }
 
     fun initDecors() {
