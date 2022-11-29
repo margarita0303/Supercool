@@ -35,40 +35,15 @@ class Matrix2d<T>(val xSize: Int, val ySize: Int, val data: Array<T>) {
         }
     }
 
-    inline fun forEachIndexed(function: (Int, Int, T) -> Unit) = data.forEachIndexed { i, t ->
-        function(
-                i % xSize,
-                i / xSize,
-                t
-        )
-    }
-
     fun getSize() = Vec2[xSize, ySize]
 
-    fun setFromList(list: List<T>) {
-        list.forEachIndexed { index, t -> data[index] = t }
-    }
-
-    fun <R : Comparable<R>> sortedBy(function: (T) -> R?): List<T> = data.sortedBy(function)
-
     inline fun <reified R> map(transform: (T) -> R): Matrix2d<R> = Matrix2d(xSize, ySize, data.map(transform))
-
-//    fun <R> mapIndexed(transform: (Int, Int, T) -> R): Matrix2d<R> = Matrix2d.fromArray(xSize, ySize,
-//            data.mapIndexed { i, t ->
-//                transform(
-//                        i % xSize,
-//                        i / xSize,
-//                        t
-//                )
-//            }
-//    )
-
 }
 
 inline fun <reified T> Matrix2d(size: Vec2, init: (Int, Int) -> T) = Matrix2d(size.x, size.y, init)
 
 inline fun <reified T> Matrix2d(xSize: Int, ySize: Int, init: (Int, Int) -> T) =
-        Matrix2d(xSize, ySize, Array(xSize * ySize) { i -> init(i % xSize, i / xSize) })
+    Matrix2d(xSize, ySize, Array(xSize * ySize) { i -> init(i % xSize, i / xSize) })
 
 inline fun <reified T> Matrix2d(xSize: Int, ySize: Int, dataList: List<T>): Matrix2d<T> =
-        Matrix2d<T>(xSize, ySize, Array<T>(dataList.size) { i -> dataList[i] })
+    Matrix2d<T>(xSize, ySize, Array<T>(dataList.size) { i -> dataList[i] })

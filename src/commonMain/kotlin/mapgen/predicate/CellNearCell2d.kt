@@ -3,7 +3,7 @@ package mapgen.predicate
 import mathutils.*
 
 
-class CellNearCell2d<T>(val cellType: T) : CellPredicate2d<T> {
+class CellNearCell2d<T>(private val cellType: T) : CellPredicate2d<T> {
 
     override fun belongs(generatedMap2d: Matrix2d<T>, x: Int, y: Int): Boolean {
         for (ix in -1..1) {
