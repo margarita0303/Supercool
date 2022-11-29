@@ -41,7 +41,7 @@ class StageHelper(
                     world.player.behavior.setAction(Walk(south))
                 }
                 down(Key.E) {
-                    world.player.behavior.setAction(OpenDoor())
+                    world.player.behavior.setAction(InteractWithDoors())
                 }
             }
         }
