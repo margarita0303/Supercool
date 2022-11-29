@@ -3,12 +3,16 @@ package game.world
 import com.soywiz.korge.view.*
 
 enum class TileType(val blocks: Boolean, val transparent: Boolean) {
-    WALL(true,  false),
-    DIRT(true,  true),
-    FLOOR(false,  true),
-    DOOR_CLOSED(true,  false),
-    DOOR_OPEN(false,  true),
-    BOOKSHELF(true,  false);
+    WALL(true, false),
+    DIRT(true, true),
+    FLOOR(false, true),
+    DOOR_CLOSED(true, false),
+    DOOR_OPEN(false, true),
+    BOOKSHELF(true, false);
+
+    fun canGoThrough(): Boolean {
+        return transparent || this == DOOR_CLOSED
+    }
 
     lateinit var animation: SpriteAnimation
 }
