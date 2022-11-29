@@ -198,6 +198,8 @@ class WorldGenerator {
         yRadius: Int,
         column: TileType,
     ): Boolean {
+        val minVec = center - Vec2(xRadius, yRadius)
+        val maxVec = center + Vec2(xRadius, yRadius)
         val xMin: Int = center.x - xRadius
         val xMax: Int = center.x + xRadius
         val yMin: Int = center.y - yRadius
@@ -206,29 +208,13 @@ class WorldGenerator {
             //circular room
             val radius: Int = min(xRadius, yRadius)
 
-            for (x in xMin - 2..xMax) {
-                for (y in yMin - 2..yMax) {
-                    if (getEuclideanDistance(
-                            x.toDouble(),
-                            y.toDouble(),
-                            center.x.toDouble(),
-                            center.y.toDouble()
-                        ) <= radius + 1 && mapLevel.get(x, y) !== sourceType
-                    )
-                        return false
-                }
+            for (coordinates in minVec - 2..maxVec) {
+                if (getEuclideanDistance(coordinates, center) <= radius + 1 && mapLevel[coordinates] !== sourceType)
+                    return false
             }
-            for (x in xMin - 1..xMax) {
-                for (y in yMin - 1..yMax) {
-                    if (getEuclideanDistance(
-                            x.toDouble(),
-                            y.toDouble(),
-                            center.x.toDouble(),
-                            center.y.toDouble()
-                        ) <= radius
-                    )
-                        mapLevel[x, y] = destinationType
-                }
+            for (coordinates in minVec - 1..maxVec) {
+                if (getEuclideanDistance(coordinates, center) <= radius)
+                    mapLevel[coordinates] = destinationType
             }
             true
         } else {
@@ -237,18 +223,14 @@ class WorldGenerator {
             val pillarsOnWalls: Boolean = coinFlip()
             val vSpacing: Int = (3..5).random()
             val hSpacing: Int = (3..5).random()
-            for (x in xMin..xMax) {
-                for (y in yMin..yMax) {
-                    if (mapLevel[x, y] !== sourceType) return false
-                }
+            for (coordinates in minVec..maxVec) {
+                if (mapLevel[coordinates] !== sourceType) return false
             }
-            for (x in xMin until xMax) {
-                for (y in yMin until yMax) {
-                    val hori = min(x - xMin, xMax - x - 1) % hSpacing == 1
-                    val vert = min(y - yMin, yMax - y - 1) % vSpacing == 1
+            for (coordinates in minVec..maxVec - 1) {
+                val hori = min(coordinates.x - xMin, xMax - coordinates.x - 1) % hSpacing == 1
+                val vert = min(coordinates.y - yMin, yMax - coordinates.y - 1) % vSpacing == 1
 
-                    mapLevel[x, y] = if (pillarsOnWalls && vert && hori) column else destinationType
-                }
+                mapLevel[coordinates] = if (pillarsOnWalls && vert && hori) column else destinationType
             }
             true
         }
