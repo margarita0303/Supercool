@@ -16,7 +16,7 @@ lateinit var exp: SpriteAnimation
 
 suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"]) {
     textureWork()
-    val world = WorldGenerator().generateMap()
+    val world = WorldBuilder().build()
     val flasks: Array<Sprite> = Array(6) { Sprite(health).xy(it * tileSize, tileSize) }
     val expFlasks: Array<Sprite> = Array(6) { Sprite(exp).xy((it + 7) * tileSize, tileSize) }
 

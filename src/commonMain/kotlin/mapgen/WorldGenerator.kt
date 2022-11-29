@@ -1,8 +1,7 @@
 package mapgen
 
 import DrawCell2d
-import GameConfig.mapHeight
-import GameConfig.mapWidth
+import GameConfig
 import GameConfig.tileSize
 import com.soywiz.korge.view.*
 import game.world.*
@@ -14,7 +13,10 @@ import mathutils.*
 import kotlin.math.*
 import kotlin.random.*
 
-class WorldGenerator {
+class WorldGenerator(
+    mapWidth: Int = GameConfig.mapWidth,
+    mapHeight: Int = GameConfig.mapHeight,
+) {
 
     private fun coinFlip() = Random.nextBoolean()
 
@@ -22,6 +24,29 @@ class WorldGenerator {
     private val enemies = listOf(EntityType.Striker)
     private val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
     private val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
+
+    private fun mapHasWay(start: Vec2, end: Vec2): Boolean {
+        val openSet = mutableListOf<Vec2>()
+        val closeSet = HashSet<Vec2>()
+
+        openSet.add(start)
+        val size = map.getSize()
+        while (openSet.isNotEmpty()) {
+            val node: Vec2 = openSet.removeLast()
+            if (closeSet.contains(node))
+                continue
+            closeSet.add(node)
+            for (next in node.vonNeumanNeighborhood()) {
+                if (next.x < 0 || next.y < 0 || next.x >= size.x || next.y >= size.y)
+                    continue
+                if (!map[next].canGoThrough())
+                    continue
+
+                openSet.add(next)
+            }
+        }
+        return closeSet.contains(end)
+    }
 
     fun generateMap(): World {
         val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true, stabber = true)
@@ -52,7 +77,10 @@ class WorldGenerator {
 
         for (roomCenterFrom in roomCenters) {
             for (roomCenterTo in roomCenters) {
-
+                if (mapHasWay(roomCenterFrom, roomCenterTo)) {
+                    if (coinFlip() || coinFlip())
+                        continue
+                }
                 val fullPath2d = findPath2d(
                     size = map.getSize(),
                     cost = {
