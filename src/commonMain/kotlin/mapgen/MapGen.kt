@@ -30,7 +30,6 @@ fun generateMap(): World {
 
     val roomCenters = mutableListOf<Vec2>()
     val entities = mutableListOf(player, enemy)
-    val collectableEntities = mutableListOf<Collectable>()
 
     (1..MAX_ROOMS).forEach {
         val w = (ROOM_MIN_SIZE..ROOM_MAX_SIZE).random()
@@ -195,7 +194,6 @@ fun generateMap(): World {
             Cell(x, y, map[x, y], decor[x, y])
         },
         entities = entities,
-        collectableEntities = collectableEntities,
         player = player
     )
 }

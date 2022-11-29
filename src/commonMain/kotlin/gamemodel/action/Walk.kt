@@ -27,16 +27,29 @@ class Walk(val dir: Vec2) : Action {
             return Failed
         }
 
+        fun findNearestDirt(): Vec2 {
+            val nearestDirt: Vec2
+            for (i in (-1..1)) {
+                for (j in (-1 .. 1)) {
+                    val potentialNearestDirt = Vec2(entity.pos.x + i, entity.pos.y + j)
+                    if (world.tiles[potentialNearestDirt].tileType == TileType.DIRT) return potentialNearestDirt
+                }
+            }
+            return Vec2(0, 0)
+        }
+
         if (world.tiles[nextPos].decor == Decor.CHEST) {
             world.tiles[nextPos].decor = Decor.CHEST_OPEN
-            val randomValue = Random.nextInt() % 2
+            val randomValue = kotlin.math.abs(Random.nextInt()) % 2
             if (randomValue == 0) {
                 val weaponItem = WeaponItem.values().toList().shuffled().first()
-                world.collectableEntities.add(Collectable(nextPos, weaponItem, null))
+                val nearestDirt = findNearestDirt()
+                world.tiles[nearestDirt].collectableEntity = Collectable(nearestDirt, weaponItem, null)
             }
             else if (randomValue == 1) {
                 val equipmentItem = EquipmentItem.values().toList().shuffled().first()
-                world.collectableEntities.add(Collectable(nextPos, null, equipmentItem))
+                val nearestDirt = findNearestDirt()
+                world.tiles[nearestDirt].collectableEntity = Collectable(nearestDirt, null, equipmentItem)
             }
         }
 

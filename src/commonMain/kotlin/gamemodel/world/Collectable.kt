@@ -10,9 +10,8 @@ class Collectable (
     var pos: Vec2,
     val weaponItem: WeaponItem?,
     val equipmentItem: EquipmentItem?,
-    val sprite: Sprite = Sprite(weaponItem?.animation ?: if (equipmentItem != null) equipmentItem.animation else
-                                throw NullPointerException()).xy(pos.x * tileSize, pos.y * tileSize),
-
+    val animation: SpriteAnimation = weaponItem?.animation ?: if (equipmentItem != null) equipmentItem.animation else throw NullPointerException(),
+    val sprite: Sprite = Sprite(animation).xy(pos.x * tileSize, pos.y * tileSize),
     )
 {
 

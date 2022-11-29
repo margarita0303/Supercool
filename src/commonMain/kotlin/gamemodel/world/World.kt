@@ -7,7 +7,6 @@ import mathutils.*
 class World(
     val tiles: Matrix2d<Cell>,
     val entities: MutableList<Entity>,
-    val collectableEntities: MutableList<Collectable>,
     var player: Entity,
 ) {
     var playerMovementTimeEffectDelay = 0.0

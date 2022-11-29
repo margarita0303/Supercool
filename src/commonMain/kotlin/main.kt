@@ -63,6 +63,7 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
                 }
                 World.GameState.Lost -> {
                     lostText.visible = true
+
                 }
             }
         })
