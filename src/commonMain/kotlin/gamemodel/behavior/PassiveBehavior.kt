@@ -11,5 +11,5 @@ class PassiveBehavior: Behavior {
         return Wait()
     }
 
-    override fun onWorldUpdated() {}
+    override fun onWorldUpdated(timeSpeed: Double) {}
 }
