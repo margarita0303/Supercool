@@ -11,18 +11,23 @@ class Cell(
     y: Int,
     var tileType: TileType,
     var decor: Decor? = null,
-    private val sprite: Sprite = Sprite(tileType.animation).xy(x * tileSize, y * tileSize),
-    private val decorSprite: Sprite? = if (decor != null) Sprite(decor.animation).xy(
-        x * tileSize,
-        y * tileSize
-    ) else null,
     var lit: Boolean = false,
     var wasLit: Boolean = false,
 ) {
+    private val sprite: Sprite by lazy { Sprite(tileType.animation).xy(x * tileSize, y * tileSize) }
+    private val decorSprite: Sprite? by lazy {
+        decor?.let {
+            Sprite(it.animation).xy(
+                x * tileSize,
+                y * tileSize
+            )
+        }
+    }
+
     fun getAllSprites(): List<Sprite> {
         val list = mutableListOf(sprite)
         if (decorSprite != null)
-            list.add(decorSprite)
+            list.add(decorSprite!!)
         return list
     }
 

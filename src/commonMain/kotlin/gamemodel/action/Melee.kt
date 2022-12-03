@@ -24,9 +24,14 @@ class Melee(
         victim.damage(damage)
         victim.applyBehaviorEffect(effect)
         entity.meleeDelay = entity.getMeleeTime()
+        if(entity.player && !victim.isAlive())
+            entity.plusExp(expForKill)
 
         return Succeeded
+    }
 
+    companion object {
+        const val expForKill = 50
     }
 
 }

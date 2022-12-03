@@ -21,7 +21,7 @@ class WorldGenerator(
     private fun coinFlip() = Random.nextBoolean()
 
 
-    private val enemies = listOf(EntityType.Striker)
+    private val enemies = listOf(EntityType.Enemy)
     private val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
     private val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
 
@@ -49,7 +49,7 @@ class WorldGenerator(
     }
 
     fun generateMap(): World {
-        val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true, stabber = true)
+        val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true)
         val roomCenters = mutableListOf<Vec2>()
         val entities = mutableListOf(player)
 

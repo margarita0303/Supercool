@@ -18,13 +18,10 @@ class Walk(val dir: Vec2) : Action {
             return Failed
         }
 
-
         val entitiesOnNextSpace = world.entities.filter { it.pos == nextPos && it.blocks }
         if(entitiesOnNextSpace.isNotEmpty()) {
             entitiesOnNextSpace.forEach {
-                val res = Melee(it).onPerform(world, entity)
-                if(res is Succeeded && entity.player && !it.isAlive())
-                    entity.plusExp(50)
+                Melee(it).onPerform(world, entity)
             }
             return Failed
         }

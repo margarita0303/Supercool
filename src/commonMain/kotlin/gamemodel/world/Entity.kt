@@ -14,14 +14,17 @@ class Entity(
     var pos: Vec2,
     var type: EntityType,
     var behavior: Behavior,
-    val sprite: Sprite = Sprite(type.standAnimation).xy(pos.x * tileSize, pos.y * tileSize),
     private val stats: Stats = Stats(type.hp, 0.0, 1.0, 0),
     private val inventory: Inventory = Inventory(null, null, null),
     val player: Boolean = false,
-    var focusAbsPos: Vec2 = Vec2(0, 0),
     var blocks: Boolean = false,
-    val stabber: Boolean = false,
 ) {
+    val sprite: Sprite by lazy {
+        Sprite(type.standAnimation).xy(pos.x * tileSize, pos.y * tileSize)
+    }
+
+    private val initialBehavior = behavior
+
     var movingDelay: Double = 0.0
     val canMoveNow: Boolean
         get() {
@@ -49,10 +52,14 @@ class Entity(
 
     fun heal(amt: Int) {
         stats.hp = min(type.hp, stats.hp + amt)
+        if (stats.hp >= type.hp * type.panicOnHpLevel)
+            behavior = initialBehavior
     }
 
     fun damage(damage: Int) {
         stats.hp = max(0, stats.hp - (damage * (1.0 - stats.protection)).toInt())
+        if (stats.hp < type.hp * type.panicOnHpLevel)
+            behavior = FearfulBehavior()
     }
 
     fun kill() {
@@ -87,10 +94,13 @@ class Entity(
 
     fun plusExp(exp: Int) {
         val prevLevel = getLevel()
+        if(prevLevel >= maxLevel)
+            return
         stats.exp += exp
         val newLevel = getLevel()
-        if (newLevel in (prevLevel + 1)..maxLevel)
+        repeat(newLevel - prevLevel) {
             levelUp()
+        }
     }
 
     fun getLevel(): Int {

@@ -66,7 +66,7 @@ class SpriteController {
             standAnimation = getAnimationOfTileSize(spriteSheet, 5, 0, 6, 1)
             moveAnimation = getAnimationOfTileSize(spriteSheet, 6, 0, 6, 1)
         }
-        EntityType.Striker.apply {
+        EntityType.Enemy.apply {
             standAnimation = getAnimationOfTileSize(spriteSheet, 5, 0, 6, 1)
             moveAnimation = getAnimationOfTileSize(spriteSheet, 6, 0, 6, 1)
         }
