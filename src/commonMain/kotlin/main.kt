@@ -9,7 +9,7 @@ import gamemodel.world.*
 import mapgen.*
 import resource_controllers.*
 import stage_utils.*
-
+import game_model_interactor.*
 
 
 suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"]) {
@@ -18,8 +18,8 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
     val world = WorldBuilder().build()
     val flasks: Array<Sprite> = Array(6) { Sprite(spriteController.getHealth()).xy(it * tileSize, tileSize) }
     val expFlasks: Array<Sprite> = Array(6) { Sprite(spriteController.getExp()).xy((it + 7) * tileSize, tileSize) }
-
-    val helper = StageHelper(this, world, flasks, expFlasks)
+    val gameModelInteractor = GameModelInteractor()
+    val helper = StageHelper(this, world, gameModelInteractor, flasks, expFlasks)
     helper.addSprites()
     helper.addControlKeys()
     helper.setUpHealthPointBar()
@@ -33,37 +33,38 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
     text("Life").xy(0, 0)
     text("Level").xy(7 * tileSize, 0)
 
-
-    world.recalculateLight()
+    gameModelInteractor.executeCommand(RecalculateLightCommand(world))
     addFixedUpdater(GameConfig.worldUpdateRate.timesPerSecond) {
-        when(world.gameState) {
-            World.GameState.Active -> {
-                val playerHealth = world.player.getHp()
-                helper.updateHealthBarState(playerHealth, world.player.type.hp)
-                helper.updateExpBarState(world.player.getLevel())
-                world.passTime()
+        gameModelInteractor.executeCommand(HandleGameStateCommand(world) { state ->
+            when (state) {
+                World.GameState.Active -> {
+                    gameModelInteractor.executeCommand(PassTimeCommand(world))
 
-                world.tiles.forEach { it ->
-                    it.updateSprites(world.timeSpeed)
-                }
+                    gameModelInteractor.executeCommand(UpdateHpAndExpCommand(world.player) { hp, maxHp, level ->
+                        helper.updateHealthBarState(hp, maxHp)
+                        helper.updateExpBarState(level)
+                    })
 
-                world.entities.forEach {
-                    it.updateSprite(world.tiles[it.pos].lit, world.timeSpeed)
+                    world.tiles.forEach { it ->
+                        it.updateSprites(world.timeSpeed)
+                    }
+
+                    world.entities.forEach {
+                        it.updateSprite(world.tiles[it.pos].lit, world.timeSpeed)
+                    }
+
+                    gameModelInteractor.executeCommand(RemoveDeadEntitiesCommand(world))
+                    gameModelInteractor.executeCommand(RecalculateLightCommand(world))
+                    gameModelInteractor.executeCommand(UpdateGameState(world))
                 }
-                world.removeDeadEntities()
-                world.recalculateLight()
-                if(!world.player.isAlive())
-                    world.gameState = World.GameState.Lost
-                else if(world.entities.none { !it.player })
-                    world.gameState = World.GameState.Won
+                World.GameState.Won -> {
+                    winText.visible = true
+                }
+                World.GameState.Lost -> {
+                    lostText.visible = true
+                }
             }
-            World.GameState.Won -> {
-                winText.visible = true
-            }
-            World.GameState.Lost -> {
-                lostText.visible = true
-            }
-        }
+        })
     }
 }
 

@@ -4,13 +4,14 @@ import com.soywiz.kds.iterators.*
 import com.soywiz.korev.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.view.*
-import gamemodel.action.*
 import gamemodel.world.*
-import math.*
+import game_model_interactor.*
+import game_model_interactor.set_player_action_commands.*
 
 class StageHelper(
     private val stage: Stage,
     private val world: World,
+    private val gameModelInteractor: GameModelInteractor,
     private val flasks: Array<Sprite>,
     private val expFlasks: Array<Sprite>,
 ) {
@@ -29,19 +30,19 @@ class StageHelper(
         with(stage) {
             keys {
                 down(Key.RIGHT) {
-                    world.player.behavior.setAction(Walk(east))
+                    gameModelInteractor.executeCommand(SetPlayerActionWalkEastCommand(world.player))
                 }
                 down(Key.UP) {
-                    world.player.behavior.setAction(Walk(north))
+                    gameModelInteractor.executeCommand(SetPlayerActionWalkNorthCommand(world.player))
                 }
                 down(Key.LEFT) {
-                    world.player.behavior.setAction(Walk(west))
+                    gameModelInteractor.executeCommand(SetPlayerActionWalkWestCommand(world.player))
                 }
                 down(Key.DOWN) {
-                    world.player.behavior.setAction(Walk(south))
+                    gameModelInteractor.executeCommand(SetPlayerActionWalkSouthCommand(world.player))
                 }
                 down(Key.E) {
-                    world.player.behavior.setAction(InteractWithDoors())
+                    gameModelInteractor.executeCommand(SetPlayerActionInteractWithDoorsCommand(world.player))
                 }
             }
         }
