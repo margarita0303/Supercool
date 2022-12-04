@@ -12,7 +12,7 @@ class World(
     var playerMovementTimeEffectDelay = 0.0
     var timeSpeed = 1.0
     var gameState : GameState = GameState.Active
-
+        private set
     fun passTime() {
         recalculateTimeSpeed()
 
@@ -59,6 +59,13 @@ class World(
         entities.removeIf {
             !it.isAlive()
         }
+    }
+
+    fun updateGameState() {
+        if (!player.isAlive())
+            gameState = GameState.Lost
+        else if (entities.none { !it.player })
+            gameState = GameState.Won
     }
 
     sealed interface GameState {

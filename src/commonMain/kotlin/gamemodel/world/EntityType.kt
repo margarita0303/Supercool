@@ -14,8 +14,6 @@ enum class EntityType(
 
     Enemy(100, 2.0, 1.0, 20, 0.35);
 
-    lateinit var standAnimation: SpriteAnimation
-    lateinit var moveAnimation: SpriteAnimation
 }
 
 

@@ -13,17 +13,18 @@ import game_model_interactor.*
 
 
 suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapHeight, bgcolor = Colors["#2b2b2b"]) {
-    val spriteController = SpriteController()
-    textureWork(spriteController)
+    val spriteController = SpriteController(this)
     val world = WorldBuilder().build()
-    val flasks: Array<Sprite> = Array(6) { Sprite(spriteController.getHealth()).xy(it * tileSize, tileSize) }
-    val expFlasks: Array<Sprite> = Array(6) { Sprite(spriteController.getExp()).xy((it + 7) * tileSize, tileSize) }
     val gameModelInteractor = GameModelInteractor()
-    val helper = StageHelper(this, world, gameModelInteractor, flasks, expFlasks)
-    helper.addSprites()
-    helper.addControlKeys()
-    helper.setUpHealthPointBar()
-    helper.setUpExpPointBar()
+    val binder = KeysBinder(this, world, gameModelInteractor)
+
+    spriteController.initBitmaps()
+    spriteController.setUpHealthPointBar()
+    spriteController.setUpExpPointBar()
+    spriteController.setUpCellsSprites(world)
+    spriteController.setUpEntitySprites(world)
+
+    binder.addControlKeys()
 
     val winText = text("YOU WIN", textSize = 24.0).xy(400, 500)
     winText.visible = false
@@ -41,16 +42,16 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
                     gameModelInteractor.executeCommand(PassTimeCommand(world))
 
                     gameModelInteractor.executeCommand(UpdateHpAndExpCommand(world.player) { hp, maxHp, level ->
-                        helper.updateHealthBarState(hp, maxHp)
-                        helper.updateExpBarState(level)
+                        spriteController.updateHealthBarState(hp, maxHp)
+                        spriteController.updateExpBarState(level)
                     })
 
                     world.tiles.forEach { it ->
-                        it.updateSprites(world.timeSpeed)
+                        spriteController.updateTileSprites(it, world.timeSpeed)
                     }
 
                     world.entities.forEach {
-                        it.updateSprite(world.tiles[it.pos].lit, world.timeSpeed)
+                        spriteController.updateEntitySprite(it, world.tiles[it.pos].lit, world.timeSpeed)
                     }
 
                     gameModelInteractor.executeCommand(RemoveDeadEntitiesCommand(world))
@@ -66,12 +67,4 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
             }
         })
     }
-}
-
-
-suspend fun textureWork(spriteController: SpriteController) {
-    spriteController.initBitmaps()
-    spriteController.setUpEntityAnimations()
-    spriteController.initTileTypes()
-    spriteController.initDecors()
 }

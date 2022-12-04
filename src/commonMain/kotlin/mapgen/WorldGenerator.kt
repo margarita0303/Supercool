@@ -141,7 +141,6 @@ class WorldGenerator(
         roomCenters.forEachIndexed { index, center ->
             if (index == 0) {
                 player.pos = center
-                player.sprite.xy(center.x * tileSize, center.y * tileSize)
             } else {
                 //TODO: add objects
                 //placeObjects(map, newRoom,  MAX_ROOM_MONSTERS, MAX_ROOM_ITEMS)
