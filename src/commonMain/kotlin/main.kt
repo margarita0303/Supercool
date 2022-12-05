@@ -19,10 +19,11 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
     val binder = KeysBinder(this, world, gameModelInteractor)
 
     spriteController.initBitmaps()
-    spriteController.setUpHealthPointBar()
-    spriteController.setUpExpPointBar()
     spriteController.setUpCellsSprites(world)
     spriteController.setUpEntitySprites(world)
+    spriteController.setUpCollectableSprites(world)
+    spriteController.setUpHealthPointBar()
+    spriteController.setUpExpPointBar()
 
     binder.addControlKeys()
 
@@ -54,7 +55,12 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
                         spriteController.updateEntitySprite(it, world.tiles[it.pos].lit, world.timeSpeed)
                     }
 
+                    world.collectables.forEach {
+                        spriteController.updateCollectableSprite(it, world.timeSpeed)
+                    }
+
                     gameModelInteractor.executeCommand(RemoveDeadEntitiesCommand(world))
+                    gameModelInteractor.executeCommand(RemoveNonExistentCollectablesCommand(world))
                     gameModelInteractor.executeCommand(RecalculateLightCommand(world))
                     gameModelInteractor.executeCommand(UpdateGameState(world))
                 }

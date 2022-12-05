@@ -14,7 +14,6 @@ class Cell(
 
     var lit: Boolean = false,
     var wasLit: Boolean = false,
-    val collectableEntitySprite: Sprite? = collectableEntity?.sprite
 ) {
 
     fun isBlocked(): Boolean = tileType.blocks || decor?.blocks ?: false

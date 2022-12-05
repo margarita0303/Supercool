@@ -152,15 +152,20 @@ class WorldGenerator(
         }
 
         // place the end as far as possible away from the start
-        val furthest = roomCenters.maxBy { getEuclideanDistance(roomCenters[0], it) }
-        decor[furthest] = Decor.CHEST
+        //val furthest = roomCenters.maxBy { getEuclideanDistance(roomCenters[0], it) }
+        //decor[furthest] = Decor.CHEST
+
+        roomCenters.drop(1).forEach {
+            decor[it] = Decor.CHEST
+        }
 
         return World(
             tiles = Matrix2d(map.getSize()) { x, y ->
                 Cell(x, y, map[x, y], decor[x, y])
             },
             entities = entities,
-            player = player
+            player = player,
+            collectables = mutableListOf()
         )
     }
 

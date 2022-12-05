@@ -14,8 +14,8 @@ class Entity(
     var pos: Vec2,
     var type: EntityType,
     var behavior: Behavior,
-    private val stats: Stats = Stats(type.hp, 0.0, 1.0, 0),
-    private val inventory: Inventory = Inventory(null, null, null),
+    private val stats: Stats = Stats(type.hp, type.damage, 0.0,1.0, 1.0, 0),
+    private val inventory: Inventory = Inventory(null, null, null, null),
     val player: Boolean = false,
     var blocks: Boolean = false,
 ) {
@@ -64,7 +64,7 @@ class Entity(
     }
 
     fun meleeAttack(): Attack {
-        val damage = ((inventory.weapon?.meleeDamage ?: type.damage) * stats.damageMultiplier).toInt()
+        val damage = (stats.damage * stats.damageMultiplier).toInt()
         val effect = inventory.weapon?.let {
             if (Random.nextDouble() < it.prob) it.effect else null
         }
@@ -72,7 +72,7 @@ class Entity(
     }
 
     fun getMoveTime(): Double {
-        return type.timeForMove
+        return type.timeForMove / stats.speed
     }
 
     fun getMeleeTime(): Double {
@@ -110,14 +110,44 @@ class Entity(
         }
     }
 
+    fun collectItem(item: Item): Item? {
+        var prev: Item? = null
+        when(item) {
+            is WeaponItem -> {
+                prev = inventory.weapon
+                inventory.weapon = item
+                stats.damage = item.meleeDamage
+            }
+            is EquipmentItem -> {
+                when(item.part) {
+                    EquipmentItem.BodyPart.Chest -> {
+                        prev = inventory.body
+                        inventory.body = item
+                    }
+                    EquipmentItem.BodyPart.Feet -> {
+                        prev = inventory.feet
+                        inventory.feet = item
+                    }
+                    EquipmentItem.BodyPart.Head -> {
+                        prev = inventory.head
+                        inventory.head = item
+                    }
+                }
+                stats.protection = item.protection
+                stats.speed = item.speed
+            }
+        }
+        return prev
+    }
+
     private fun levelUp() {
         type.hp += 10
         type.damage += 5
     }
 
 
-    data class Stats(var hp: Int, var protection: Double, var damageMultiplier: Double, var exp: Int)
-    data class Inventory(var weapon: WeaponItem?, var body: EquipmentItem?, var feet: EquipmentItem?)
+    data class Stats(var hp: Int, var damage: Int, var protection: Double, var speed: Double, var damageMultiplier: Double, var exp: Int)
+    data class Inventory(var weapon: WeaponItem?, var head: EquipmentItem?, var body: EquipmentItem?, var feet: EquipmentItem?)
     data class Attack(val damage: Int, val effect: BehaviorChanger?)
 
     companion object {

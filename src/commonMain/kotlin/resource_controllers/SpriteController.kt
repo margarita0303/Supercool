@@ -9,7 +9,6 @@ import com.soywiz.korim.color.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.geom.*
-import com.soywiz.korma.geom.fastForEachWithIndex
 import game.world.*
 import gamemodel.world.*
 
@@ -23,6 +22,9 @@ class SpriteController(private val stage: Stage) {
     private val decorSpriteAnimations: MutableMap<Decor, SpriteAnimation> = mutableMapOf()
     private val cellSprites: MutableMap<Cell, Sprite> = mutableMapOf()
     private val cellDecorSprites: MutableMap<Cell, Sprite?> = mutableMapOf()
+    private val itemsSpriteAnimations: MutableMap<Item, SpriteAnimation> = mutableMapOf()
+    private val itemsSprites: MutableMap<Collectable, Sprite> = mutableMapOf()
+
     private var flasks: Array<Sprite> = arrayOf()
     private var expFlasks: Array<Sprite> = arrayOf()
 
@@ -169,15 +171,42 @@ class SpriteController(private val stage: Stage) {
     }
 
 
-    fun initCollectableTypes() {
-        EquipmentItem.HELMET.animation = getAnimationOfTileSize(armor, 0, 0)
-        EquipmentItem.SCAPULAR.animation = getAnimationOfTileSize(armor, 0, 1)
-        EquipmentItem.BODY_ARMOR.animation = getAnimationOfTileSize(armor, 0, 2)
-        EquipmentItem.PANTS.animation = getAnimationOfTileSize(armor, 0, 3)
-        EquipmentItem.SHOES.animation = getAnimationOfTileSize(armor, 0, 4)
-        WeaponItem.SWORD.animation = getAnimationOfTileSize(weapon, 1, 0)
-        WeaponItem.AX.animation = getAnimationOfTileSize(weapon, 7, 5)
-        WeaponItem.TRIDENT.animation = getAnimationOfTileSize(weapon, 1, 10)
+    fun setUpCollectableSprites(world: World) {
+        EquipmentItem.values().forEach {
+            when (it) {
+                EquipmentItem.HELMET -> itemsSpriteAnimations[it] = getAnimationOfTileSize(armor, 0, 0)
+                EquipmentItem.BODY_ARMOR -> itemsSpriteAnimations[it] = getAnimationOfTileSize(armor, 0, 2)
+                EquipmentItem.SHOES -> itemsSpriteAnimations[it] = getAnimationOfTileSize(armor, 0, 4)
+            }
+        }
+
+        WeaponItem.values().forEach {
+            when (it) {
+                WeaponItem.SWORD -> itemsSpriteAnimations[it] = getAnimationOfTileSize(weapon, 1, 0)
+                WeaponItem.AX -> itemsSpriteAnimations[it] = getAnimationOfTileSize(weapon, 7, 5)
+                WeaponItem.TRIDENT -> itemsSpriteAnimations[it] = getAnimationOfTileSize(weapon, 1, 10)
+            }
+        }
+        world.collectables.forEach {
+            val itemSpriteAnimation = it.getSpriteAnimation()
+            val sprite = Sprite(itemSpriteAnimation).xy(it.pos.x * tileSize, it.pos.y * tileSize)
+            itemsSprites[it] = sprite
+            stage.addChild(sprite)
+        }
+    }
+
+    fun updateCollectableSprite(collectable: Collectable, timeSpeed: Double) {
+        val itemAnimation = collectable.getSpriteAnimation()
+        val itemSprite = collectable.getSprite()
+        if (collectable.exists) {
+            itemSprite.playAnimationLooped(
+                itemAnimation,
+                spriteDisplayTime = 500.milliseconds / timeSpeed
+            )
+        } else {
+            itemSprite.stopAnimation()
+            itemSprite.visible = false
+        }
     }
 
     private fun getHealthSprite(): SpriteAnimation {
@@ -235,6 +264,23 @@ class SpriteController(private val stage: Stage) {
 
     private fun Entity.getTypeSpriteAnimations(): EntityTypeSpriteAnimations {
         return entityTypeSpriteAnimations[type] ?: throw IllegalStateException()
+    }
+
+    private fun Collectable.getSprite(): Sprite {
+        return itemsSprites.getOrPut(
+            this
+        ) {
+            val itemSpriteAnimation = getSpriteAnimation()
+            val sprite = Sprite(
+                itemSpriteAnimation
+            ).xy(pos.x * tileSize, pos.y * tileSize)
+            stage.addChild(sprite)
+            sprite
+        }
+    }
+
+    private fun Collectable.getSpriteAnimation(): SpriteAnimation {
+        return itemsSpriteAnimations[item] ?: throw IllegalStateException()
     }
 
     private fun Cell.getTileSprite(): Sprite {

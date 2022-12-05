@@ -7,6 +7,7 @@ import mathutils.*
 class World(
     val tiles: Matrix2d<Cell>,
     val entities: MutableList<Entity>,
+    val collectables: MutableList<Collectable>,
     var player: Entity,
 ) {
     var playerMovementTimeEffectDelay = 0.0
@@ -58,6 +59,12 @@ class World(
     fun removeDeadEntities() {
         entities.removeIf {
             !it.isAlive()
+        }
+    }
+
+    fun removeNonExistentCollectables() {
+        collectables.removeIf {
+            !it.exists
         }
     }
 
