@@ -10,9 +10,9 @@ enum class EntityType(
     var panicOnHpLevel: Double
         ) {
 
-    Player(100, 0.5, 1.0, 35, 0.0),
+    Player(100, 0.15, 1.0, 35, 0.0),
 
-    Enemy(100, 2.0, 1.0, 20, 0.35);
+    Enemy(100, 1.0, 1.0, 20, 0.35);
 
 }
 

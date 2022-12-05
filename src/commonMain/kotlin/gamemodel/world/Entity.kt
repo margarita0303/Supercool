@@ -80,13 +80,14 @@ class Entity(
     }
 
     fun onWorldUpdated(timeSpeed: Double) {
+        val relTimeSpeed = if(player) 1.0 else timeSpeed
         if (movingDelay > 0)
-            movingDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
+            movingDelay -= (1.0 / GameConfig.worldUpdateRate) * relTimeSpeed
 
         if (meleeDelay > 0)
-            meleeDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
+            meleeDelay -= (1.0 / GameConfig.worldUpdateRate) * relTimeSpeed
 
-        behavior.onWorldUpdated(timeSpeed)
+        behavior.onWorldUpdated(relTimeSpeed)
     }
 
     fun plusExp(exp: Int) {
