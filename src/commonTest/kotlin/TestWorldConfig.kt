@@ -22,6 +22,7 @@ class TestWorldConfig {
             }
         },
         entities = mutableListOf(player, enemy),
-        player = player
+        player = player,
+        collectables = mutableListOf()
     )
 }
