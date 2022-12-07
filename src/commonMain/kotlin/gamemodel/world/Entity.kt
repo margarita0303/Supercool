@@ -37,14 +37,13 @@ class Entity(
             return meleeDelay <= 0
         }
 
-    var absPos: Vec2 = pos.toAbsPosCenter()
+    var regenerateDelay: Double = 0.0
+    private val canRegenerateNow: Boolean
         get() {
-            return pos.toAbsPosCenter()
+            return regenerateDelay <= 0
         }
-        set(value) {
-            field = value
-            pos = field.toTilePos()
-        }
+
+    private var isInventoryChanged = false
 
     fun isAlive(): Boolean = stats.hp > 0
 
@@ -56,14 +55,24 @@ class Entity(
             behavior = initialBehavior
     }
 
+    fun tryRegenerate(timeSpeed: Double) {
+        if(canRegenerateNow) {
+            heal(type.hp / 10)
+            resetRegenerateDelay()
+        } else {
+            regenerateDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
+        }
+    }
+
+    private fun resetRegenerateDelay() {
+        regenerateDelay = 3.0
+    }
+
     fun damage(damage: Int) {
         stats.hp = max(0, stats.hp - (damage * (1.0 - stats.protection)).toInt())
         if (stats.hp < type.hp * type.panicOnHpLevel)
             behavior = FearfulBehavior()
-    }
-
-    fun kill() {
-        stats.hp = 0
+        resetRegenerateDelay()
     }
 
     fun meleeAttack(): Attack {
@@ -141,12 +150,22 @@ class Entity(
                 stats.speed = item.speed
             }
         }
+        isInventoryChanged = true
         return prev
+    }
+
+    fun getInventoryIfChanged(): Inventory? {
+        return if(isInventoryChanged) {
+            isInventoryChanged = false
+            inventory
+        } else {
+            null
+        }
     }
 
     private fun levelUp() {
         type.hp += 10
-        type.damage += 5
+        stats.damageMultiplier += 0.05
     }
 
 

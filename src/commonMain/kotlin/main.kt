@@ -24,6 +24,7 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
     spriteController.setUpCollectableSprites(world)
     spriteController.setUpHealthPointBar()
     spriteController.setUpExpPointBar()
+    spriteController.setUpInventoryBar()
 
     binder.addControlKeys()
 
@@ -34,6 +35,7 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
 
     text("Life").xy(0, 0)
     text("Level").xy(7 * tileSize, 0)
+    text("Inventory").xy(14 * tileSize, 0)
 
     gameModelInteractor.executeCommand(RecalculateLightCommand(world))
     addFixedUpdater(GameConfig.worldUpdateRate.timesPerSecond) {
@@ -57,6 +59,10 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
 
                     world.collectables.forEach {
                         spriteController.updateCollectableSprite(it, world.timeSpeed)
+                    }
+
+                    world.player.getInventoryIfChanged()?.let {
+                        spriteController.updateInventoryBar(it)
                     }
 
                     gameModelInteractor.executeCommand(RemoveDeadEntitiesCommand(world))

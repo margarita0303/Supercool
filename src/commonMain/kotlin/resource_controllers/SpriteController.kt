@@ -27,6 +27,7 @@ class SpriteController(private val stage: Stage) {
     private val cellDecorSprites: MutableMap<Cell, Sprite?> = mutableMapOf()
     private val itemsSpriteAnimations: MutableMap<Item, SpriteAnimation> = mutableMapOf()
     private val itemsSprites: MutableMap<Collectable, Sprite> = mutableMapOf()
+    private val invSprites = Array<Sprite?>(4) { null }
 
     private var flasks: Array<Sprite> = arrayOf()
     private var expFlasks: Array<Sprite> = arrayOf()
@@ -231,6 +232,59 @@ class SpriteController(private val stage: Stage) {
 
         with(stage) {
             expFlasks.forEach { addChild(it) }
+        }
+    }
+
+    fun setUpInventoryBar() {
+        with(stage) {
+            for (i in 0 until 4) {
+                val invCell =
+                    RoundRect(
+                        tileSize.toDouble(),
+                        tileSize.toDouble(),
+                        5.0,
+                        5.0,
+                        fill = Colors["#835200"],
+                        stroke = Colors.BLACK
+                    ).xy(
+                        (14 + i) * tileSize,
+                        tileSize
+                    )
+                addChild(invCell)
+            }
+        }
+    }
+
+    fun updateInventoryBar(inventory: Entity.Inventory) {
+        with(stage) {
+            inventory.weapon?.let {
+                val animation = itemsSpriteAnimations[it] ?: throw IllegalStateException()
+                val sprite = Sprite(animation).xy(14 * tileSize, tileSize)
+                invSprites[0]?.let { s -> removeChild(s) }
+                addChild(sprite)
+                invSprites[0] = sprite
+            }
+            inventory.head?.let {
+                val animation = itemsSpriteAnimations[it] ?: throw IllegalStateException()
+                val sprite = Sprite(animation).xy(15 * tileSize, tileSize)
+                invSprites[1]?.let { s -> removeChild(s) }
+                addChild(sprite)
+                invSprites[1] = sprite
+            }
+            inventory.body?.let {
+                val animation = itemsSpriteAnimations[it] ?: throw IllegalStateException()
+                val sprite = Sprite(animation).xy(16 * tileSize, tileSize)
+                invSprites[2]?.let { s -> removeChild(s) }
+                addChild(sprite)
+                invSprites[2] = sprite
+            }
+            inventory.feet?.let {
+                val animation = itemsSpriteAnimations[it] ?: throw IllegalStateException()
+                val sprite = Sprite(animation).xy(17 * tileSize, tileSize)
+                invSprites[3]?.let { s -> removeChild(s) }
+                addChild(sprite)
+                invSprites[3] = sprite
+            }
         }
     }
 
