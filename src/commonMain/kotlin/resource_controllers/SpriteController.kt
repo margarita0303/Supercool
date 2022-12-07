@@ -12,6 +12,9 @@ import com.soywiz.korma.geom.*
 import game.world.*
 import gamemodel.world.*
 
+/**
+ * Sets up and updates textures of game model objects which need to be shown
+ * */
 class SpriteController(private val stage: Stage) {
 
     private lateinit var tileMap: Bitmap
@@ -32,9 +35,6 @@ class SpriteController(private val stage: Stage) {
     private lateinit var weapon: Bitmap
 
     suspend fun initBitmaps() {
-        /**
-         * This function must be called every time before any other method is used
-         */
         tileMap = resourcesVfs["tilemap${tileSize}px.png"].readBitmap()
         spriteSheet = resourcesVfs["spritesheet${tileSize}px.png"].readBitmap()
         armor = resourcesVfs["armor${tileSize}px.png"].readBitmap()

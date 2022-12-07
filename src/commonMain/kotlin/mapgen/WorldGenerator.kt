@@ -13,6 +13,9 @@ import mathutils.*
 import kotlin.math.*
 import kotlin.random.*
 
+/**
+ * Generates the game world
+ * */
 class WorldGenerator(
     mapWidth: Int = GameConfig.mapWidth,
     mapHeight: Int = GameConfig.mapHeight,

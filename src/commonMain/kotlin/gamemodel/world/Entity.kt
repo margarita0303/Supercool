@@ -10,6 +10,9 @@ import math.*
 import kotlin.math.*
 import kotlin.random.*
 
+/**
+ * Represents game character (player or NPC)
+ * */
 class Entity(
     var pos: Vec2,
     var type: EntityType,

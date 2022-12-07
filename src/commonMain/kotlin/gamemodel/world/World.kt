@@ -4,6 +4,9 @@ import GameConfig
 import math.*
 import mathutils.*
 
+/**
+ *  Current state of game world
+ * */
 class World(
     val tiles: Matrix2d<Cell>,
     val entities: MutableList<Entity>,
@@ -14,6 +17,10 @@ class World(
     var timeSpeed = 1.0
     var gameState : GameState = GameState.Active
         private set
+
+    /**
+     * Calling this method causes the world to be updated
+     * */
     fun passTime() {
         recalculateTimeSpeed()
 
@@ -24,6 +31,9 @@ class World(
 
     }
 
+    /**
+     * Update cell illumination
+     * */
     fun recalculateLight() {
         // set all to false
         // find player, in radius make visible
