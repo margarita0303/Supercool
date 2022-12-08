@@ -21,8 +21,8 @@ class ConfusingBehaviorChanger : BehaviorChanger {
                 }
             }
 
-            override fun onWorldUpdated() {
-                effectRemainingTime -= 1.0 / GameConfig.worldUpdateRate
+            override fun onWorldUpdated(timeSpeed: Double) {
+                effectRemainingTime -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
             }
 
         }

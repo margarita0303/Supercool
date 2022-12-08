@@ -82,7 +82,7 @@ class Entity(
         if (meleeDelay > 0)
             meleeDelay -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
 
-        behavior.onWorldUpdated()
+        behavior.onWorldUpdated(timeSpeed)
     }
 
     fun plusExp(exp: Int) {
