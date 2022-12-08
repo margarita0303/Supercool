@@ -55,13 +55,11 @@ class Walk(val dir: Vec2) : Action {
 
         entity.pos = nextPos
 
-        if(entity.player) {
-            entity.movingDelay = entity.getMoveTime()
-            world.playerMovementTimeEffectDelay = entity.movingDelay
-        } else {
-            entity.movingDelay = entity.getMoveTime()
-        }
 
+        entity.resetMoveDelay()
+        if(entity.player) {
+            world.playerMovementTimeEffectDelay = entity.getMoveTime()
+        }
 
         return Succeeded
     }

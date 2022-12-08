@@ -25,19 +25,19 @@ class Entity(
 
     private val initialBehavior = behavior
 
-    var movingDelay: Double = 0.0
+    private var movingDelay: Double = 0.0
     val canMoveNow: Boolean
         get() {
             return movingDelay <= 0
         }
 
-    var meleeDelay: Double = 0.0
+    private var meleeDelay: Double = 0.0
     val canMeleeNow: Boolean
         get() {
             return meleeDelay <= 0
         }
 
-    var regenerateDelay: Double = 0.0
+    private var regenerateDelay: Double = 0.0
     private val canRegenerateNow: Boolean
         get() {
             return regenerateDelay <= 0
@@ -68,6 +68,14 @@ class Entity(
         regenerateDelay = 3.0
     }
 
+    fun resetMoveDelay() {
+        movingDelay = getMoveTime()
+    }
+
+    fun resetMeleeDelay() {
+        meleeDelay = getMeleeTime()
+    }
+
     fun damage(damage: Int) {
         stats.hp = max(0, stats.hp - (damage * (1.0 - stats.protection)).toInt())
         if (stats.hp < type.hp * type.panicOnHpLevel)
@@ -87,7 +95,7 @@ class Entity(
         return type.timeForMove / stats.speed
     }
 
-    fun getMeleeTime(): Double {
+    private fun getMeleeTime(): Double {
         return inventory.weapon?.timeForMelee ?: type.timeForMelee
     }
 

@@ -44,10 +44,8 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
                 World.GameState.Active -> {
                     gameModelInteractor.executeCommand(PassTimeCommand(world))
 
-                    gameModelInteractor.executeCommand(UpdateHpAndExpCommand(world.player) { hp, maxHp, level ->
-                        spriteController.updateHealthBarState(hp, maxHp)
-                        spriteController.updateExpBarState(level)
-                    })
+                    spriteController.updateHealthBarState(world.player.getHp(), world.player.type.hp)
+                    spriteController.updateExpBarState(world.player.getLevel())
 
                     world.tiles.forEach { it ->
                         spriteController.updateTileSprites(it, world.timeSpeed)
@@ -75,7 +73,6 @@ suspend fun main() = Korge(width = tileSize * mapWidth, height = tileSize * mapH
                 }
                 World.GameState.Lost -> {
                     lostText.visible = true
-
                 }
             }
         })
