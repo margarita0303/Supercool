@@ -20,7 +20,8 @@ class ChangedBehaviour(private val baseBehavior: Behavior) : Behavior {
     }
 
     override fun onWorldUpdated(timeSpeed: Double) {
-        effectRemainingTime -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
+        if(effectRemainingTime > 0)
+            effectRemainingTime -= (1.0 / GameConfig.worldUpdateRate) * timeSpeed
     }
 
     override fun replicate(): Behavior {

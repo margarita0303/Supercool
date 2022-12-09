@@ -6,9 +6,9 @@ import gamemodel.behavior.*
 sealed interface Item
 
 enum class WeaponItem(val meleeDamage: Int, val timeForMelee: Double, val effect: BehaviorChanger, val prob: Double) : Item {
-    SWORD(60,0.5, ConfusingBehaviorChanger(), 0.1),
-    AX(140,1.0, ConfusingBehaviorChanger(), 0.1),
-    TRIDENT(90,0.9, ConfusingBehaviorChanger(), 0.1);
+    SWORD(50,0.5, ConfusingBehaviorChanger(), 0.5),
+    AX(100,1.0, ConfusingBehaviorChanger(), 0.1),
+    TRIDENT(80,0.9, ConfusingBehaviorChanger(), 0.25);
 }
 
 enum class EquipmentItem(val protection: Double, val speed: Double, val part: BodyPart) : Item {

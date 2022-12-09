@@ -21,8 +21,8 @@ class Melee(
         }
 
         val (damage, effect) = entity.meleeAttack()
-        victim.damage(damage)
         victim.applyBehaviorEffect(effect)
+        victim.damage(damage)
         entity.resetMeleeDelay()
         if(entity.player && !victim.isAlive())
             entity.plusExp(expForKill)
@@ -31,7 +31,7 @@ class Melee(
     }
 
     companion object {
-        const val expForKill = 50
+        const val expForKill = 35
     }
 
 }
