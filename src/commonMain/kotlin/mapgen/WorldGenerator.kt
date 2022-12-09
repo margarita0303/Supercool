@@ -2,8 +2,6 @@ package mapgen
 
 import DrawCell2d
 import GameConfig
-import GameConfig.tileSize
-import com.soywiz.korge.view.*
 import game.world.*
 import gamemodel.behavior.*
 import gamemodel.world.*
@@ -13,15 +11,18 @@ import mathutils.*
 import kotlin.math.*
 import kotlin.random.*
 
+/**
+ * Generates the game world
+ * */
 class WorldGenerator(
     mapWidth: Int = GameConfig.mapWidth,
     mapHeight: Int = GameConfig.mapHeight,
+    private val mobFactory: MobFactory,
 ) {
 
     private fun coinFlip() = Random.nextBoolean()
 
 
-    private val enemies = listOf(EntityType.Striker)
     private val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
     private val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
 
@@ -49,7 +50,7 @@ class WorldGenerator(
     }
 
     fun generateMap(): World {
-        val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true, stabber = true)
+        val player = Entity(Vec2(7, 7), EntityType.Player, NoAiBehavior(), player = true, blocks = true)
         val roomCenters = mutableListOf<Vec2>()
         val entities = mutableListOf(player)
 
@@ -141,27 +142,32 @@ class WorldGenerator(
         roomCenters.forEachIndexed { index, center ->
             if (index == 0) {
                 player.pos = center
-                player.sprite.xy(center.x * tileSize, center.y * tileSize)
             } else {
-                //TODO: add objects
-                //placeObjects(map, newRoom,  MAX_ROOM_MONSTERS, MAX_ROOM_ITEMS)
-                val surrounds = center.mooreNeighborhood().filter { !map[it].blocks }.shuffled()
+                val surrounds =
+                    center.mooreNeighborhood().flatMap { it.mooreNeighborhood() }.toSet().toList()
+                        .filter { !map[it].blocks }
+                        .shuffled().take(3)
                 repeat((0 until min(4, surrounds.size)).random()) {
-                    entities += Entity(surrounds[it], enemies.random(), AggressiveBehavior(), blocks = true)
+                    entities += mobFactory.createNextMob(surrounds[it])
                 }
             }
         }
 
         // place the end as far as possible away from the start
-        val furthest = roomCenters.maxBy { getEuclideanDistance(roomCenters[0], it) }
-        decor[furthest] = Decor.CHEST
+        //val furthest = roomCenters.maxBy { getEuclideanDistance(roomCenters[0], it) }
+        //decor[furthest] = Decor.CHEST
+
+        roomCenters.drop(1).forEach {
+            decor[it] = Decor.CHEST
+        }
 
         return World(
             tiles = Matrix2d(map.getSize()) { x, y ->
                 Cell(x, y, map[x, y], decor[x, y])
             },
             entities = entities,
-            player = player
+            player = player,
+            collectables = mutableListOf()
         )
     }
 

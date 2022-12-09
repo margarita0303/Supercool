@@ -1,19 +1,20 @@
 package gamemodel.action
 
 import game.world.*
-import gamemodel.world.Entity
-import gamemodel.world.World
+import gamemodel.world.*
 
 
-
-class Loot : Action {
+class Loot(private val collectable: Collectable) : Action {
 
     override fun onPerform(world: World, entity: Entity): ActionResult {
-        entity.pos.vonNeumanNeighborhood().forEach {
-            if(world.tiles[it].decor == Decor.CHEST) {
-                // TODO choose random weapon or equipment item
-            }
+        if(!entity.player) {
+            return Failed
         }
+        val prev = entity.collectItem(collectable.item)
+        if(prev == null)
+            collectable.exists = false
+        else
+            collectable.item = prev
         return Succeeded
     }
 

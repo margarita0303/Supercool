@@ -1,9 +1,10 @@
 package gamemodel.action
 
-import gamemodel.world.Entity
-import gamemodel.world.World
+import game.world.*
+import gamemodel.world.*
 //import gameState
 import math.Vec2
+import kotlin.random.*
 
 
 class Walk(val dir: Vec2) : Action {
@@ -18,13 +19,30 @@ class Walk(val dir: Vec2) : Action {
             return Failed
         }
 
-
         val entitiesOnNextSpace = world.entities.filter { it.pos == nextPos && it.blocks }
         if(entitiesOnNextSpace.isNotEmpty()) {
             entitiesOnNextSpace.forEach {
-                val res = Melee(it).onPerform(world, entity)
-                if(res is Succeeded && entity.player && !it.isAlive())
-                    entity.plusExp(50)
+                Melee(it).onPerform(world, entity)
+            }
+            return Failed
+        }
+
+        val collectablesOnNextSpace = world.collectables.filter { it.pos == nextPos }
+        if(collectablesOnNextSpace.isNotEmpty()) {
+            Loot(collectablesOnNextSpace.first()).onPerform(world, entity)
+            return Failed
+        }
+
+        if (entity.player && world.tiles[nextPos].decor == Decor.CHEST) {
+            world.tiles[nextPos].decor = Decor.CHEST_OPEN
+            val randomValue = kotlin.math.abs(Random.nextInt()) % 2
+            if (randomValue == 0) {
+                val weaponItem = WeaponItem.values().toList().shuffled().first()
+                world.collectables.add(Collectable(nextPos, weaponItem))
+            }
+            else if (randomValue == 1) {
+                val equipmentItem = EquipmentItem.values().toList().shuffled().first()
+                world.collectables.add(Collectable(nextPos, equipmentItem))
             }
             return Failed
         }
@@ -37,13 +55,11 @@ class Walk(val dir: Vec2) : Action {
 
         entity.pos = nextPos
 
-        if(entity.player) {
-            entity.movingDelay = entity.getMoveTime()
-            world.playerMovementTimeEffectDelay = entity.movingDelay
-        } else {
-            entity.movingDelay = entity.getMoveTime()
-        }
 
+        entity.resetMoveDelay()
+        if(entity.player) {
+            world.playerMovementTimeEffectDelay = entity.getMoveTime()
+        }
 
         return Succeeded
     }

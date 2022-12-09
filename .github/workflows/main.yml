@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main", "Implementation_1", "Implementation_2" ]
+    branches: [ "main", "Implementation_1", "Implementation_2", "feature/adding_armors_and_weapons" ]
   pull_request:
-    branches: [ "main", "Implementation_1", "Implementation_2" ]
+    branches: [ "main", "Implementation_1", "Implementation_2", "feature/adding_armors_and_weapons" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
