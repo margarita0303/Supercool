@@ -146,8 +146,8 @@ class WorldGenerator(
                 val surrounds =
                     center.mooreNeighborhood().flatMap { it.mooreNeighborhood() }.toSet().toList()
                         .filter { !map[it].blocks }
-                        .shuffled().take(3)
-                repeat((0 until min(4, surrounds.size)).random()) {
+                        .shuffled()
+                repeat(if (surrounds.size < 2) surrounds.size else (2..min(4, surrounds.size)).random()) {
                     entities += mobFactory.createNextMob(surrounds[it])
                 }
             }

@@ -20,6 +20,7 @@ class Entity(
 ) : Replicatable<Entity> {
 
     private val initialBehavior = behavior
+    private var isPanic = false
 
     var movingDelay: Double = 0.0
     val canMoveNow: Boolean
@@ -45,12 +46,6 @@ class Entity(
 
     fun getHp(): Int = stats.hp
 
-    fun heal(amt: Int) {
-        stats.hp = min(type.hp, stats.hp + amt)
-        if (stats.hp >= type.hp * type.panicOnHpLevel)
-            behavior = initialBehavior
-    }
-
     fun tryRegenerate(timeSpeed: Double) {
         if (canRegenerateNow) {
             heal(type.hp / 10)
@@ -74,10 +69,21 @@ class Entity(
 
     fun damage(damage: Int) {
         stats.hp = max(0, stats.hp - (damage * (1.0 - stats.protection)).toInt())
-        if (stats.hp < type.hp * type.panicOnHpLevel)
+        if (!isPanic && stats.hp < type.hp * type.panicOnHpLevel) {
+            isPanic = true
             behavior = FearfulBehavior()
+        }
         resetRegenerateDelay()
     }
+
+    fun heal(amt: Int) {
+        stats.hp = min(type.hp, stats.hp + amt)
+        if (isPanic && stats.hp >= type.hp * type.panicOnHpLevel) {
+            isPanic = false
+            behavior = initialBehavior
+        }
+    }
+
 
     fun meleeAttack(): Attack {
         val damage = (stats.damage * stats.damageMultiplier).toInt()
