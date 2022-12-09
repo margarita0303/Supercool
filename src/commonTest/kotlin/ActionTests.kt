@@ -1,5 +1,6 @@
 import game.world.*
 import gamemodel.action.*
+import gamemodel.world.*
 import math.*
 import kotlin.test.*
 
@@ -59,5 +60,13 @@ class ActionTests {
         assertEquals(res, Succeeded)
         assertEquals(enemy.pos, Vec2(2, 4))
         resetEnemyPos()
+    }
+
+    @Test
+    fun testLoot() {
+        val collectable = Collectable(Vec2(2, 1), WeaponItem.SWORD)
+        val res = Loot(collectable).onPerform(testWorld, player)
+        assertEquals(res, Succeeded)
+        assertEquals(player.getInventoryIfChanged()?.weapon, WeaponItem.SWORD)
     }
 }
