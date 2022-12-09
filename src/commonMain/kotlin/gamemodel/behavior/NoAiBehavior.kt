@@ -14,6 +14,9 @@ class NoAiBehavior : Behavior {
     }
 
     override fun onWorldUpdated(timeSpeed: Double) {}
+    override fun replicate(): Behavior {
+        return NoAiBehavior()
+    }
 
     override fun setAction(action: Action?) {
         this.action = action

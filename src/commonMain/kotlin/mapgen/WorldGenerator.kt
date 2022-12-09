@@ -2,8 +2,6 @@ package mapgen
 
 import DrawCell2d
 import GameConfig
-import GameConfig.tileSize
-import com.soywiz.korge.view.*
 import game.world.*
 import gamemodel.behavior.*
 import gamemodel.world.*
@@ -19,12 +17,12 @@ import kotlin.random.*
 class WorldGenerator(
     mapWidth: Int = GameConfig.mapWidth,
     mapHeight: Int = GameConfig.mapHeight,
+    private val mobFactory: MobFactory,
 ) {
 
     private fun coinFlip() = Random.nextBoolean()
 
 
-    private val enemies = listOf(EntityType.Enemy)
     private val map = Matrix2d(mapWidth, mapHeight) { _, _ -> TileType.DIRT }
     private val decor = Matrix2d<Decor?>(map.getSize()) { _, _ -> null }
 
@@ -145,11 +143,12 @@ class WorldGenerator(
             if (index == 0) {
                 player.pos = center
             } else {
-                //TODO: add objects
-                //placeObjects(map, newRoom,  MAX_ROOM_MONSTERS, MAX_ROOM_ITEMS)
-                val surrounds = center.mooreNeighborhood().filter { !map[it].blocks }.shuffled()
+                val surrounds =
+                    center.mooreNeighborhood().flatMap { it.mooreNeighborhood() }.toSet().toList()
+                        .filter { !map[it].blocks }
+                        .shuffled().take(3)
                 repeat((0 until min(4, surrounds.size)).random()) {
-                    entities += Entity(surrounds[it], enemies.random(), AggressiveBehavior(), blocks = true)
+                    entities += mobFactory.createNextMob(surrounds[it])
                 }
             }
         }

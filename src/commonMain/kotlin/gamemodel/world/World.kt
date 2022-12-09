@@ -15,7 +15,7 @@ class World(
 ) {
     var playerMovementTimeEffectDelay = 0.0
     var timeSpeed = 1.0
-    var gameState : GameState = GameState.Active
+    var gameState: GameState = GameState.Active
         private set
 
     /**
@@ -40,7 +40,7 @@ class World(
         tiles.forEach { it -> it.lit = false }
         val players = entities.filter { it.player }
         players.forEach { player ->
-
+            
             for (xD in (-10..10)) {
                 for (yD in (-10..10)) {
 
@@ -48,9 +48,9 @@ class World(
                     val y = player.pos.y + yD
 
                     if (tiles.contains(x, y)
-                            && getEuclideanDistance(0.0, 0.0, xD.toDouble(), yD.toDouble()) < 10
-                            && (los(player.pos.x, player.pos.y, x, y) { x, y -> !tiles[x, y].tileType.blocks }
-                                    || los(x, y, player.pos.x, player.pos.y) { x, y -> !tiles[x, y].tileType.blocks })
+                        && getEuclideanDistance(0.0, 0.0, xD.toDouble(), yD.toDouble()) < 10
+                        && (los(player.pos.x, player.pos.y, x, y) { x, y -> !tiles[x, y].tileType.blocks }
+                            || los(x, y, player.pos.x, player.pos.y) { x, y -> !tiles[x, y].tileType.blocks })
                     ) {
                         tiles[x, y].lit = true
                         tiles[x, y].wasLit = true
@@ -62,7 +62,7 @@ class World(
 
     private fun recalculateTimeSpeed() {
         playerMovementTimeEffectDelay -= 1.0 / GameConfig.worldUpdateRate
-        val moveCoef = if(playerMovementTimeEffectDelay <= 0) 1.0 else 4.0 // TODO: find function for coef
+        val moveCoef = if (playerMovementTimeEffectDelay <= 0) 1.0 else 4.0 // TODO: find function for coef
         timeSpeed = moveCoef
     }
 
@@ -83,6 +83,10 @@ class World(
             gameState = GameState.Lost
         else if (entities.none { !it.player })
             gameState = GameState.Won
+    }
+
+    fun canSpawnOn(it: Vec2): Boolean {
+        return !tiles[it].isBlocked() && entities.all { entity -> entity.pos != it }
     }
 
     sealed interface GameState {

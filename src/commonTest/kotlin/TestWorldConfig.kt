@@ -6,7 +6,7 @@ import mathutils.*
 
 class TestWorldConfig {
     val player = Entity(Vec2(2, 2), EntityType.Player, NoAiBehavior(), player = true, blocks = true)
-    val enemy = Entity(Vec2(2, 3), EntityType.Enemy, NoAiBehavior(), player = false, blocks = true)
+    val enemy = Entity(Vec2(2, 3), EntityType.EnemyWarrior, NoAiBehavior(), player = false, blocks = true)
     val testWorld = World(
         tiles= Matrix2d(Vec2(6, 6)) { i, j ->
             when {

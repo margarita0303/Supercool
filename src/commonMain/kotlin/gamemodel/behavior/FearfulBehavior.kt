@@ -7,7 +7,7 @@ import math.*
 class FearfulBehavior : Behavior {
     override fun setAction(action: Action?) {}
 
-    override fun getNextAction(entity: Entity, world: World): Action? {
+    override fun getNextAction(entity: Entity, world: World): Action {
         entity.tryRegenerate(world.timeSpeed)
 
         val isVisible = isSecondEntityVisibleByFirst(entity.pos, world.player.pos, 10.0, world)
@@ -19,4 +19,7 @@ class FearfulBehavior : Behavior {
     }
 
     override fun onWorldUpdated(timeSpeed: Double) {}
+    override fun replicate(): Behavior {
+        return FearfulBehavior()
+    }
 }

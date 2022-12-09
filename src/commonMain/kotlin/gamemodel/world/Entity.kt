@@ -1,10 +1,6 @@
 package gamemodel.world
 
 import GameConfig
-import GameConfig.tileSize
-import com.soywiz.klock.*
-import com.soywiz.korge.view.*
-import com.soywiz.korma.geom.*
 import gamemodel.behavior.*
 import math.*
 import kotlin.math.*
@@ -17,15 +13,15 @@ class Entity(
     var pos: Vec2,
     var type: EntityType,
     var behavior: Behavior,
-    private val stats: Stats = Stats(type.hp, type.damage, 0.0,1.0, 1.0, 0),
+    private val stats: Stats = Stats(type.hp, type.damage, 0.0, 1.0, 1.0, 0),
     private val inventory: Inventory = Inventory(null, null, null, null),
     val player: Boolean = false,
     var blocks: Boolean = false,
-) {
+) : Replicatable<Entity> {
 
     private val initialBehavior = behavior
 
-    private var movingDelay: Double = 0.0
+    var movingDelay: Double = 0.0
     val canMoveNow: Boolean
         get() {
             return movingDelay <= 0
@@ -56,7 +52,7 @@ class Entity(
     }
 
     fun tryRegenerate(timeSpeed: Double) {
-        if(canRegenerateNow) {
+        if (canRegenerateNow) {
             heal(type.hp / 10)
             resetRegenerateDelay()
         } else {
@@ -100,7 +96,7 @@ class Entity(
     }
 
     fun onWorldUpdated(timeSpeed: Double) {
-        val relTimeSpeed = if(player) 1.0 else timeSpeed
+        val relTimeSpeed = if (player) 1.0 else timeSpeed
         if (movingDelay > 0)
             movingDelay -= (1.0 / GameConfig.worldUpdateRate) * relTimeSpeed
 
@@ -112,7 +108,7 @@ class Entity(
 
     fun plusExp(exp: Int) {
         val prevLevel = getLevel()
-        if(prevLevel >= maxLevel)
+        if (prevLevel >= maxLevel)
             return
         stats.exp += exp
         val newLevel = getLevel()
@@ -133,22 +129,25 @@ class Entity(
 
     fun collectItem(item: Item): Item? {
         var prev: Item? = null
-        when(item) {
+        when (item) {
             is WeaponItem -> {
                 prev = inventory.weapon
                 inventory.weapon = item
                 stats.damage = item.meleeDamage
             }
+
             is EquipmentItem -> {
-                when(item.part) {
+                when (item.part) {
                     EquipmentItem.BodyPart.Chest -> {
                         prev = inventory.body
                         inventory.body = item
                     }
+
                     EquipmentItem.BodyPart.Feet -> {
                         prev = inventory.feet
                         inventory.feet = item
                     }
+
                     EquipmentItem.BodyPart.Head -> {
                         prev = inventory.head
                         inventory.head = item
@@ -163,7 +162,7 @@ class Entity(
     }
 
     fun getInventoryIfChanged(): Inventory? {
-        return if(isInventoryChanged) {
+        return if (isInventoryChanged) {
             isInventoryChanged = false
             inventory
         } else {
@@ -177,12 +176,30 @@ class Entity(
     }
 
 
-    data class Stats(var hp: Int, var damage: Int, var protection: Double, var speed: Double, var damageMultiplier: Double, var exp: Int)
-    data class Inventory(var weapon: WeaponItem?, var head: EquipmentItem?, var body: EquipmentItem?, var feet: EquipmentItem?)
+    data class Stats(
+        var hp: Int,
+        var damage: Int,
+        var protection: Double,
+        var speed: Double,
+        var damageMultiplier: Double,
+        var exp: Int,
+    )
+
+    data class Inventory(
+        var weapon: WeaponItem?,
+        var head: EquipmentItem?,
+        var body: EquipmentItem?,
+        var feet: EquipmentItem?,
+    )
+
     data class Attack(val damage: Int, val effect: BehaviorChanger?)
 
     companion object {
         const val levelExp = 100
         const val maxLevel = 6
+    }
+
+    override fun replicate(): Entity {
+        return Entity(pos, type, behavior, stats.copy(), inventory.copy(), player, blocks)
     }
 }

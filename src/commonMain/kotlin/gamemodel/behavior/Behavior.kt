@@ -1,13 +1,13 @@
 package gamemodel.behavior
 
 
-import gamemodel.action.Action
+import gamemodel.action.*
 import gamemodel.world.*
 
 /**
  * Encapsulates logic of entity behavior
  * */
-interface Behavior {
+interface Behavior : Replicatable<Behavior> {
     /**
      * Set some action that should to be performed by entity
      * */

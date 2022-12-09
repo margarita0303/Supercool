@@ -12,6 +12,7 @@ class WorldBuilder {
         class ManualGenerated : Type() {
             var width: Int = 32
             var height: Int = 32
+            var factory: MobFactory = MobFactory()
         }
     }
 
@@ -24,6 +25,17 @@ class WorldBuilder {
             val currentType = type
             currentType as Type.FileGenerated
             currentType.file = file
+        }
+        return this
+    }
+
+    fun setFactory(factory: MobFactory): WorldBuilder {
+        if (type is Type.FileGenerated) {
+            throw IllegalStateException("World is set to be file generated already")
+        } else {
+            val currentType = type
+            currentType as Type.ManualGenerated
+            currentType.factory = factory
         }
         return this
     }
@@ -53,7 +65,11 @@ class WorldBuilder {
     fun build(): World {
         return when (type) {
             is Type.FileGenerated -> readFromFile((type as Type.FileGenerated).file)
-            is Type.ManualGenerated -> WorldGenerator().generateMap()
+            is Type.ManualGenerated -> {
+                with(type as Type.ManualGenerated) {
+                    WorldGenerator(width, height, factory).generateMap()
+                }
+            }
         }
     }
 

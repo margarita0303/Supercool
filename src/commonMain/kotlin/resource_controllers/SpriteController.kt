@@ -96,7 +96,7 @@ class SpriteController(private val stage: Stage) {
             val decorAnimation = tile.getDecorAnimation()
             val sprite = tile.getTileSprite()
             val decorSprite = tile.getDecorSprite()
-            sprite.visible = lit || wasLit
+            sprite.visible = true
             sprite.colorMul = if (!lit && wasLit) Colors.DARKGRAY else Colors.WHITE
             sprite.playAnimationLooped(tileTypeAnimation, spriteDisplayTime = 500.milliseconds / timeSpeed)
 
@@ -118,10 +118,18 @@ class SpriteController(private val stage: Stage) {
                         moveAnimation = getAnimationOfTileSize(spriteSheet, 6, 0, 6, 1)
                     )
                 }
-                EntityType.Enemy -> {
+
+                EntityType.EnemyWarrior -> {
                     entityTypeSpriteAnimations[it] = EntityTypeSpriteAnimations(
-                        standAnimation = getAnimationOfTileSize(spriteSheet, 5, 0, 6, 1),
-                        moveAnimation = getAnimationOfTileSize(spriteSheet, 6, 0, 6, 1)
+                        standAnimation = getAnimationOfTileSize(spriteSheet, 9, 0, 6, 1),
+                        moveAnimation = getAnimationOfTileSize(spriteSheet, 10, 0, 6, 1)
+                    )
+                }
+
+                EntityType.Slime -> {
+                    entityTypeSpriteAnimations[it] = EntityTypeSpriteAnimations(
+                        standAnimation = getAnimationOfTileSize(spriteSheet, 3, 0, 6, 1),
+                        moveAnimation = getAnimationOfTileSize(spriteSheet, 4, 0, 6, 1)
                     )
                 }
             }
