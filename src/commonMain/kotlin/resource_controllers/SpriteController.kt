@@ -96,7 +96,7 @@ class SpriteController(private val stage: Stage) {
             val decorAnimation = tile.getDecorAnimation()
             val sprite = tile.getTileSprite()
             val decorSprite = tile.getDecorSprite()
-            sprite.visible = true
+            sprite.visible = lit || wasLit
             sprite.colorMul = if (!lit && wasLit) Colors.DARKGRAY else Colors.WHITE
             sprite.playAnimationLooped(tileTypeAnimation, spriteDisplayTime = 500.milliseconds / timeSpeed)
 

@@ -11,6 +11,8 @@ val south = Vec2(0, 1)
 data class Vec2(val x: Int, val y: Int) {
 
 
+    val length: Double = sqrt(x.toDouble().pow(2) + y.toDouble().pow(2))
+
     operator fun plus(dir: Vec2): Vec2 = get(x + dir.x, y + dir.y)
 
 

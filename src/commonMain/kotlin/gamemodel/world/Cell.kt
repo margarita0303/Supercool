@@ -1,9 +1,5 @@
 package gamemodel.world
 
-import GameConfig.tileSize
-import com.soywiz.klock.*
-import com.soywiz.korge.view.*
-import com.soywiz.korim.color.*
 import game.world.*
 
 /**
@@ -14,10 +10,15 @@ class Cell(
     val y: Int,
     var tileType: TileType,
     var decor: Decor? = null,
-
-    var lit: Boolean = false,
-    var wasLit: Boolean = false,
 ) {
+    var lit: Boolean = false
+        set(value) {
+            field = value
+            if (value)
+                wasLit = true
+        }
+
+    var wasLit: Boolean = false
 
     /**
      * Determines whether entity can step into cell
